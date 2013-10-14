@@ -1,28 +1,28 @@
 ﻿<ul class="pager">
-   @if (Blog.CurrentPage > 1)
-    {
-        <li class="previous"><a href="@PagingUrl(-1)" rel="next">&larr; Newer</a></li>
-    }
-    @if (Blog.GetPosts(Blog.PostsPerPage * 2).Count() > Blog.PostsPerPage)
-    {
-        <li class="next"><a href="@PagingUrl(1)" rel="prev">Older &rarr;</a></li>
-    }
+	@if (Blog.CurrentPage > 1)
+	{
+		<li class="previous"><a href="@PagingUrl(-1)" rel="next">&larr; Newer</a></li>
+	}
+	@if (Blog.GetPosts(Blog.PostsPerPage * 2).Count() > Blog.PostsPerPage)
+	{
+		<li class="next"><a href="@PagingUrl(1)" rel="prev">Older &rarr;</a></li>
+	}
 </ul>
 
 @functions
 {
-    string PagingUrl(int move)
-    {
-        string url = "/page/{0}/";
-        string category = Request.QueryString["category"];
+	string PagingUrl(int move)
+	{
+		string url = "/page/{0}/";
+		string category = Request.QueryString["category"];
 
-        if (!string.IsNullOrEmpty(category))
-        {
-            url = "/category/" + HttpUtility.UrlEncode(category.ToLowerInvariant()) + "/" + url;
-        }
+		if (!string.IsNullOrEmpty(category))
+		{
+			url = "/category/" + HttpUtility.UrlEncode(category.ToLowerInvariant()) + "/" + url;
+		}
 
-        string relative = string.Format("~" + url, Blog.CurrentPage + move);
+		string relative = string.Format("~" + url, Blog.CurrentPage + move);
 
-        return VirtualPathUtility.ToAbsolute(relative);
-    }
+		return VirtualPathUtility.ToAbsolute(relative);
+	}
 }
