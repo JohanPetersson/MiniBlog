@@ -1,0 +1,543 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>Johan</author>
+  <title>Using categories as tags in EPiServer</title>
+  <description />
+  <content>&lt;p&gt;First of all, big thanks to &lt;a href="http://labs.episerver.com/en/Blogs/Anders-Hattestad/"&gt;Anders Hattestad&lt;/a&gt; and all his great contributions to the community! Some months ago he posted a great &lt;a href="http://labs.episerver.com/en/Blogs/Anders-Hattestad/Dates/2009/3/Category---more-than-labeling/"&gt;post&lt;/a&gt; on how to use categories in a better way. I´ve taken his code and refined it a bit.&lt;/p&gt;  &lt;p&gt;[more]&lt;/p&gt;  &lt;p&gt;&lt;a href="http://www.dodavinkeln.se/image.axd?picture=categoryaddorselect.png"&gt;&lt;img class="right" alt="" src="http://www.dodavinkeln.se/image.axd?picture=categoryaddorselect_thumb.png" width="254" height="139" /&gt;&lt;/a&gt; I started with the gui first. The dropdown and the inputs needed some more styling to match EPiServer’s gui.&lt;/p&gt;  &lt;p&gt;Then I realized that all page categories were saved to the property, so if you where retrieving the property by&lt;/p&gt;  &lt;pre class="brush: csharp;"&gt;CurrentPage[&amp;quot;BlogPostTags&amp;quot;]&lt;/pre&gt;
+
+&lt;p&gt;you would get all categories returned, not the ones just specified in the property. And you could not deselect any category on the page, just add new ones.&lt;/p&gt;
+
+&lt;p&gt;By default the property doesn´t hide the categories on the “Categories” tab. If you want to hide all categories just go to admin mode and change the visibility to false on the root category for the property.&lt;/p&gt;
+
+&lt;pre class="brush: csharp;"&gt;namespace DV.Properties
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Web.UI;
+    using System.Web.UI.WebControls;
+    using EPiServer;
+    using EPiServer.Core;
+    using EPiServer.DataAbstraction;
+    using EPiServer.PlugIn;
+    using EPiServer.Web.PropertyControls;
+
+    [Serializable]
+    [PageDefinitionTypePlugIn(
+        DisplayName = &amp;quot;Category selection - select or add&amp;quot;,
+        Description = &amp;quot;Category selection - select or add&amp;quot;)]
+    public class PropertySelectOrAddCategory : PropertyCategory
+    {
+        public override EPiServer.Core.IPropertyControl CreatePropertyControl()
+        {
+            return new PropertySelectOrAddCategoryControl();
+        }
+    }
+
+    public class AttachEvents : PlugInAttribute
+    {
+        public static void Start()
+        {
+            DataFactory.Instance.CreatingPage += new PageEventHandler(Instance_SavingPage);
+            DataFactory.Instance.SavingPage += new PageEventHandler(Instance_SavingPage);
+        }
+
+        static void Instance_SavingPage(object sender, EPiServer.PageEventArgs e)
+        {
+            CategoryList oldValue = e.Page.Category;
+            CategoryList newValue = new CategoryList();
+            bool customPropertyExists = false;
+
+            foreach (PropertyData prop in e.Page.Property)
+            {
+                if (prop.GetType() == typeof(PropertySelectOrAddCategory)
+                {
+                    customPropertyExists = true;
+
+                    foreach (int catId in oldValue)
+                    {
+                        Category thisCat = Category.Find(catId);
+
+                        if (thisCat.Parent == null || thisCat.Parent.Name != prop.Name)
+                        {
+                            newValue.Add(catId);
+                        }
+                    }
+
+                    foreach (int catId in (prop as PropertySelectOrAddCategory).Category)
+                    {
+                        newValue.Add(catId);
+                    }
+                }
+            }
+
+            if (customPropertyExists)
+            {
+                e.Page.Property[&amp;quot;PageCategory&amp;quot;].Value = newValue;
+            }
+        }
+    }
+
+    public class PropertySelectOrAddCategoryControl : PropertyStringControl
+    {
+        List&amp;lt;CheckBox&amp;gt; CheckBoxList = new List&amp;lt;CheckBox&amp;gt;();
+        TextBox oldItemsBox;
+        TextBox addNewBox;
+
+        public override void CreateEditControls()
+        {
+            #region Display controls
+
+            Panel outerDiv = new Panel();
+            outerDiv.Style.Add(&amp;quot;position&amp;quot;, &amp;quot;relative&amp;quot;);
+            outerDiv.Style.Add(&amp;quot;overflow&amp;quot;, &amp;quot;visible&amp;quot;);
+            this.Controls.Add(outerDiv);
+
+            addNewBox = new TextBox();
+            addNewBox.ID = this.Name + &amp;quot;NewText&amp;quot;;
+            addNewBox.CssClass = &amp;quot;episize240&amp;quot;;
+            addNewBox.Attributes.Add(&amp;quot;autocomplete&amp;quot;, &amp;quot;off&amp;quot;);
+            outerDiv.Controls.Add(addNewBox);
+
+            Button addBtn = new Button();
+            addBtn.Text = &amp;quot;+&amp;quot;;
+            addBtn.CssClass = &amp;quot;epismallbutton&amp;quot;;
+            outerDiv.Controls.Add(addBtn);
+
+            Panel theDiv = new Panel();
+            theDiv.ID = this.Name + &amp;quot;Options&amp;quot;;
+            theDiv.CssClass = &amp;quot;AutoCompleteWrapper&amp;quot;;
+            outerDiv.Controls.Add(theDiv);
+
+            oldItemsBox = new TextBox();
+            oldItemsBox.Style.Add(&amp;quot;display&amp;quot;, &amp;quot;none&amp;quot;);
+            oldItemsBox.ID = this.Name + &amp;quot;Old&amp;quot;;
+            this.Controls.Add(oldItemsBox);
+
+            EPiServer.ClientScript.ScriptManager current = EPiServer.ClientScript.ScriptManager.Current;
+
+            if (current != null)
+            {
+                current.AddEventListener(addBtn, new EPiServer.ClientScript.Events.DisablePageLeaveEvent(EPiServer.ClientScript.EventType.Click));
+            }
+
+            #endregion
+
+            Category root = GetRoot();
+            Dictionary&amp;lt;string, CategoryItem&amp;gt; existing = new Dictionary&amp;lt;string, CategoryItem&amp;gt;();
+            Dictionary&amp;lt;string, CategoryItem&amp;gt; shown = new Dictionary&amp;lt;string, CategoryItem&amp;gt;();
+            List&amp;lt;Category&amp;gt; all = new List&amp;lt;Category&amp;gt;();
+
+            #region Find what to show
+
+            //First time
+            CategoryItem item = null;
+            foreach (EPiServer.DataAbstraction.Category cat in root.Categories)
+            {
+                item = new CategoryItem(cat);
+                if (!existing.ContainsKey(item.Key))
+                {
+                    existing.Add(item.Key, item);
+                    if (CurrentPage.Category.MemberOf(cat.ID))
+                    {
+                        shown.Add(item.Key, item);
+                    }
+                }
+            }
+
+            //second time
+            if (this.Page.Request[oldItemsBox.UniqueID] != null)
+            {
+                string[] split = this.Page.Request[oldItemsBox.UniqueID].Split(&amp;quot;;&amp;quot;.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string s in split)
+                {
+                    item = new CategoryItem(s);
+
+                    if (!existing.ContainsKey(item.Key))
+                    {
+                        existing.Add(item.Key, item);
+                        shown.Add(item.Key, item);
+                    }
+                    else if (!shown.ContainsKey(item.Key))
+                    {
+                        shown.Add(item.Key, existing[item.Key]);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(this.Page.Request[addNewBox.UniqueID]))
+                {
+                    item = new CategoryItem(this.Page.Request[addNewBox.UniqueID]);
+
+                    if (!existing.ContainsKey(item.Key))
+                    {
+                        existing.Add(item.Key, item);
+                        shown.Add(item.Key, item);
+                    }
+                    else if (!shown.ContainsKey(item.Key))
+                    {
+                        shown.Add(item.Key, existing[item.Key]);
+                    }
+                }
+            }
+
+            #endregion
+
+            foreach (CategoryItem s in shown.Values)
+            {
+                this.Controls.Add(new LiteralControl(&amp;quot;&amp;lt;div&amp;gt;&amp;quot;));
+                CheckBox check = new CheckBox();
+                check.ID = s.Key;
+                check.Text = s.Name;
+                check.Checked = true;
+                this.Controls.Add(check);
+                this.Controls.Add(new LiteralControl(&amp;quot;&amp;lt;/div&amp;gt;&amp;quot;));
+
+                this.CheckBoxList.Add(check);
+            }
+
+            #region AutoComplete
+
+            ScriptManager.RegisterClientScriptBlock(this, typeof(PropertySelectOrAddCategory), &amp;quot;Startup&amp;quot; + this.Name, jsScript, false);
+            string dataArray = &amp;quot;&amp;quot;;
+            string scriptString = &amp;quot;&amp;lt;script language=\&amp;quot;JavaScript\&amp;quot;&amp;gt;&amp;quot;;
+
+            foreach (CategoryItem sub in existing.Values)
+            {
+                if (dataArray != &amp;quot;&amp;quot;)
+                    dataArray += &amp;quot;,&amp;quot;;
+                dataArray += &amp;quot;\&amp;quot;&amp;quot; + sub.Name + &amp;quot;\&amp;quot;&amp;quot;;
+            }
+            scriptString += &amp;quot;\n new AutoComplete(&amp;quot; + System.Environment.NewLine +
+                &amp;quot; [&amp;quot; + dataArray + &amp;quot;],&amp;quot; + System.Environment.NewLine +
+                &amp;quot; document.getElementById('&amp;quot; + addNewBox.ClientID + &amp;quot;'),&amp;quot; + System.Environment.NewLine +
+                &amp;quot; document.getElementById('&amp;quot; + theDiv.ClientID + &amp;quot;'),&amp;quot; + System.Environment.NewLine +
+                &amp;quot; 25)&amp;quot;;
+            scriptString += &amp;quot;&amp;lt;/script&amp;gt;&amp;quot;;
+            ScriptManager.RegisterStartupScript(this, typeof(PropertySelectOrAddCategory), &amp;quot;Startup&amp;quot; + this.Name, scriptString, false);
+
+            #endregion
+        }
+
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+
+            if (oldItemsBox != null)
+            {
+                string saveVal = &amp;quot;&amp;quot;;
+
+                foreach (CheckBox check in CheckBoxList)
+                {
+                    if (saveVal != &amp;quot;&amp;quot;)
+                    {
+                        saveVal += &amp;quot;;&amp;quot;;
+                    }
+
+                    saveVal += check.Text;
+                }
+
+                oldItemsBox.Text = saveVal;
+                addNewBox.Text = &amp;quot;&amp;quot;;
+            }
+        }
+
+        public override void ApplyEditChanges()
+        {
+            CategoryList result = new CategoryList();
+
+            Category root = GetRoot();
+
+            foreach (CheckBox box in CheckBoxList)
+            {
+                if (this.Page.Request[box.UniqueID] != null)
+                {
+                    Category thisCat = root.FindChild(box.Text);
+
+                    if (thisCat == null)
+                    {
+                        thisCat = EnsureCategoryExists(root, box.Text, box.Text, true);
+                    }
+
+                    result.Add(thisCat.ID);
+                }
+            }
+
+            SetValue(result);
+        }
+
+        public Category GetRoot()
+        {
+            Category root = Category.GetRoot();
+
+            return EnsureCategoryExists(root, this.Name, this.Name, false);
+        }
+
+        public Category EnsureCategoryExists(Category parent, string name, string description, bool selectable)
+        {
+            Category result = parent.FindChild(name);
+
+            if (result == null)
+            {
+                result = new Category(name, description);
+                result.Parent = parent;
+                result.Selectable = selectable;
+                result.Available = true;
+                result.Save();
+            }
+
+            return result;
+        }
+
+        public PropertySelectOrAddCategory PropertySelectOrAddCategory
+        {
+            get
+            {
+                return PropertyData as PropertySelectOrAddCategory;
+            }
+        }
+
+        string jsScript = @&amp;quot;
+        &amp;lt;style&amp;gt;
+            .AutoCompleteWrapper {
+                position:absolute;
+                visibility:hidden;
+                left:20px;
+                top:20px;
+                z-index:100;
+                border:1px solid #000;
+                background:#fff;
+            }
+            .AutoCompleteWrapper div {
+                padding:5px 10px;
+                cursor:hand;
+                cursor:pointer;
+            }
+            .AutoCompleteBackground {
+                background-color:#fff;
+            }
+            .AutoCompleteHighlight {
+                background-color:#ccc;
+            }
+        &amp;lt;/style&amp;gt;
+
+
+        &amp;lt;script language=&amp;quot;&amp;quot;javascript&amp;quot;&amp;quot;&amp;gt;
+
+            function AutoCompleteDB() {
+                // set the initial values.
+                this.bEnd = false;
+                this.nCount = 0;
+                this.aStr = new Object;
+            }
+
+            AutoCompleteDB.prototype.add = function(str) {
+                // increment the count value.
+                this.nCount++;
+
+                // if at the end of the string, flag this node as an end point.
+                if (str == &amp;quot;&amp;quot;&amp;quot;&amp;quot;)
+                    this.bEnd = true;
+                else {
+                    // otherwise, pull the first letter off the string
+                    var letter = str.substring(0, 1);
+                    var rest = str.substring(1, str.length);
+
+                    // and either create a child node for it or reuse an old one.
+                    if (!this.aStr[letter]) this.aStr[letter] = new AutoCompleteDB();
+                    this.aStr[letter].add(rest);
+                }
+            }
+
+            AutoCompleteDB.prototype.getCount = function(str, bExact) {
+                // if end of search string, return number
+                if (str == &amp;quot;&amp;quot;&amp;quot;&amp;quot;)
+                    if (this.bEnd &amp;amp;&amp;amp; bExact &amp;amp;&amp;amp; (this.nCount == 1)) return 0;
+                else return this.nCount;
+
+                // otherwise, pull the first letter off the string
+                var letter = str.substring(0, 1);
+                var rest = str.substring(1, str.length);
+
+                // and look for case-insensitive matches
+                var nCount = 0;
+                var lLetter = letter.toLowerCase();
+                if (this.aStr[lLetter])
+                    nCount += this.aStr[lLetter].getCount(rest, bExact &amp;amp;&amp;amp; (letter == lLetter));
+
+                var uLetter = letter.toUpperCase();
+                if (this.aStr[uLetter])
+                    nCount += this.aStr[uLetter].getCount(rest, bExact &amp;amp;&amp;amp; (letter == uLetter));
+
+                return nCount;
+            }
+
+            AutoCompleteDB.prototype.getStrings = function(str1, str2, outStr) {
+                if (str1 == &amp;quot;&amp;quot;&amp;quot;&amp;quot;) {
+                    // add matching strings to the array
+                    if (this.bEnd)
+                        outStr.push(str2);
+
+                    // get strings for each child node
+                    for (var i in this.aStr)
+                        this.aStr[i].getStrings(str1, str2 + i, outStr);
+                }
+                else {
+                    // pull the first letter off the string
+                    var letter = str1.substring(0, 1);
+                    var rest = str1.substring(1, str1.length);
+
+                    // and get the case-insensitive matches.
+                    var lLetter = letter.toLowerCase();
+                    if (this.aStr[lLetter])
+                        this.aStr[lLetter].getStrings(rest, str2 + lLetter, outStr);
+
+                    var uLetter = letter.toUpperCase();
+                    if (this.aStr[uLetter])
+                        this.aStr[uLetter].getStrings(rest, str2 + uLetter, outStr);
+                }
+            }
+
+
+            function AutoComplete(aStr, oText, oDiv, nMaxSize) {
+                // initialize member variables
+                this.oText = oText;
+                this.oDiv = oDiv;
+                this.nMaxSize = nMaxSize;
+                if (!oText)
+                    return;
+                    
+                // preprocess the texts for fast access
+                this.db = new AutoCompleteDB();
+                var i, n = aStr.length;
+                for (i = 0; i &amp;lt; n; i++) {
+                    this.db.add(aStr[i]);
+                }
+
+                // attach handlers to the text-box
+                oText.AutoComplete = this;
+                oText.onkeyup = AutoComplete.prototype.onTextChange;
+                oText.onblur = AutoComplete.prototype.onTextBlur;
+            }
+
+            AutoComplete.prototype.onTextBlur = function() {
+                this.AutoComplete.onblur();
+            }
+
+            AutoComplete.prototype.onblur = function() {
+                this.oDiv.style.visibility = &amp;quot;&amp;quot;hidden&amp;quot;&amp;quot;;
+            }
+
+            AutoComplete.prototype.onTextChange = function() {
+                this.AutoComplete.onchange();
+            }
+
+            AutoComplete.prototype.onDivMouseDown = function() {
+                this.AutoComplete.oText.value = this.innerHTML;
+            }
+
+            AutoComplete.prototype.onDivMouseOver = function() {
+                this.className = &amp;quot;&amp;quot;AutoCompleteHighlight&amp;quot;&amp;quot;;
+            }
+
+            AutoComplete.prototype.onDivMouseOut = function() {
+                this.className = &amp;quot;&amp;quot;AutoCompleteBackground&amp;quot;&amp;quot;;
+            }
+
+            AutoComplete.prototype.onchange = function() {
+                var txt = this.oText.value;
+
+                // count the number of strings that match the text-box value
+                var nCount = this.db.getCount(txt, true);
+
+                // if a suitable number then show the popup-div
+                if ((this.nMaxSize == -1) || ((nCount &amp;lt; this.nMaxSize) &amp;amp;&amp;amp; (nCount &amp;gt; 0))) {
+                    // clear the popup-div.
+                    while (this.oDiv.hasChildNodes())
+                        this.oDiv.removeChild(this.oDiv.firstChild);
+
+                    // get all the matching strings from the AutoCompleteDB
+                    var aStr = new Array();
+                    this.db.getStrings(txt, &amp;quot;&amp;quot;&amp;quot;&amp;quot;, aStr);
+
+                    // add each string to the popup-div
+                    var i, n = aStr.length;
+                    for (i = 0; i &amp;lt; n; i++) {
+                        var oDiv = document.createElement('div');
+                        this.oDiv.appendChild(oDiv);
+                        oDiv.innerHTML = aStr[i];
+                        oDiv.onmousedown = AutoComplete.prototype.onDivMouseDown;
+                        oDiv.onmouseover = AutoComplete.prototype.onDivMouseOver;
+                        oDiv.onmouseout = AutoComplete.prototype.onDivMouseOut;
+                        oDiv.AutoComplete = this;
+                    }
+                    this.oDiv.style.visibility = &amp;quot;&amp;quot;visible&amp;quot;&amp;quot;;
+                }
+                else // hide the popup-div
+                {
+                    this.oDiv.innerHTML = &amp;quot;&amp;quot;&amp;quot;&amp;quot;;
+                    this.oDiv.style.visibility = &amp;quot;&amp;quot;hidden&amp;quot;&amp;quot;;
+                }
+            }
+        &amp;lt;/script&amp;gt;&amp;quot;;
+
+        public class CategoryItem
+        {
+            public CategoryItem(string name)
+            {
+                Name = name;
+            }
+
+            public CategoryItem(EPiServer.DataAbstraction.Category cat)
+            {
+                Cat = cat;
+                Name = cat.Name;
+            }
+
+            public EPiServer.DataAbstraction.Category Cat;
+            public string Name;
+            string key;
+
+            public string Key
+            {
+                get
+                {
+                    if (key == null)
+                    {
+                        key = Name.ToLower().Trim().Replace(&amp;quot; &amp;quot;, &amp;quot;&amp;quot;).Replace(&amp;quot;.&amp;quot;, &amp;quot;&amp;quot;);
+                    }
+
+                    return key;
+                }
+            }
+        }
+    }
+}&lt;/pre&gt;</content>
+  <ispublished>True</ispublished>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2009-12-23 15:49:39</pubDate>
+  <lastModified>2010-02-04 17:19:59</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>using-categories-as-tags-in-episerver</slug>
+  <tags>
+    <tag>ui</tag>
+    <tag>fixes</tag>
+    <tag>custom property</tag>
+  </tags>
+  <comments>
+    <comment id="37571aaa-34e2-4da3-88fa-c52a1c264d18" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2009-12-25 20:42:21</date>
+      <author>Anders Hattestad</author>
+      <email>anders.hattestad@objectware.no</email>
+      <country />
+      <ip>93.185.169.94</ip>
+      <content>&lt;p&gt;Great work, and cool that you have made the consept way better:)&lt;/p&gt;</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>bf74dc56-651d-4a32-89bf-d757b885fc05</category>
+  </categories>
+  <notifications>
+    <email>anders.hattestad@objectware.no</email>
+  </notifications>
+</post>

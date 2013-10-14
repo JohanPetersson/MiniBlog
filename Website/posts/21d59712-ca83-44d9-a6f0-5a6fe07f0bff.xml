@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>Johan</author>
+  <title>Divider custom property</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.dodavinkeln.se/image.axd?picture=divider.png"&gt;&lt;img class="right" alt="" src="http://www.dodavinkeln.se/image.axd?picture=divider_thumb.png" width="154" height="132" /&gt;&lt;/a&gt; Sometimes tabs isn’t enough for grouping properties. That’s where the divider property comes in.&lt;/p&gt;  &lt;p&gt;[more]&lt;/p&gt;  &lt;p&gt;First we have to remove all the controls. We also have to specify &lt;em&gt;TableRowLayout.Wide&lt;/em&gt; so the divider spans the whole page width.&lt;/p&gt;  &lt;pre class="brush: csharp;"&gt;
+namespace DV.CustomProperties
+{
+    using EPiServer.Core;
+    using EPiServer.Web.PropertyControls;
+
+    public class PropertyDividerControl : PropertyNumberControl
+    {
+        public override void CreateEditControls()
+        {
+            this.Controls.Clear();
+        }
+
+        public override void ApplyChanges()
+        {
+
+        }
+
+        public override TableRowLayout RowLayout
+        {
+            get { return TableRowLayout.Wide; }
+        }
+
+        public PropertyDivider PropertyDivider
+        {
+            get { return PropertyData as PropertyDivider; }
+        }
+    }
+}
+&lt;/pre&gt;
+
+&lt;p&gt;And then we return a nicely styled display name.&lt;/p&gt;
+
+&lt;pre class="brush: csharp;"&gt;
+namespace DV.CustomProperties
+{
+    using System;
+    using EPiServer.Core;
+    using EPiServer.PlugIn;
+
+    [PageDefinitionTypePlugIn(DisplayName = &amp;quot;Divider&amp;quot;, Description = &amp;quot;Divider&amp;quot;)]
+    public class PropertyDivider : PropertyNumber
+    {
+        public override string TranslateDisplayName()
+        {
+            return string.Format(&amp;quot;&amp;lt;h2 style=\&amp;quot;margin:2em 0 0.4em 0; padding:0 0 0.3em 0; border:1px solid #666; border-width:0 0 1px 0; font:bold 13px sans-serif;\&amp;quot;&amp;gt;{0}&amp;lt;/h2&amp;gt;&amp;quot;,
+                base.TranslateDisplayName());
+        }
+
+        public override EPiServer.Core.IPropertyControl CreatePropertyControl()
+        {
+            return new PropertyDividerControl();
+        }
+    }
+}
+&lt;/pre&gt;</content>
+  <ispublished>True</ispublished>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2009-10-15 21:23:00</pubDate>
+  <lastModified>2009-11-25 09:16:59</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>divider-custom-property</slug>
+  <tags>
+    <tag>custom property</tag>
+  </tags>
+  <comments />
+  <categories>
+    <category>bf74dc56-651d-4a32-89bf-d757b885fc05</category>
+  </categories>
+  <notifications />
+</post>

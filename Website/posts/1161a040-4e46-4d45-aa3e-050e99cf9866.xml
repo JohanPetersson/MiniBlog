@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>Johan</author>
+  <title>Some useful extension methods</title>
+  <description />
+  <content>&lt;p&gt;Sometimes you don't want to use dynamic properties but still needs to find a certain page with a property or a page with a specific pagetype id.&lt;/p&gt;  &lt;p&gt;Here's my take on it.&lt;/p&gt;  &lt;p&gt;[more]&lt;/p&gt;  &lt;p&gt;These functions probably needs some error handling, but they still shows the concept.&lt;/p&gt;  &lt;pre class="brush: csharp;"&gt;/// &amp;lt;summary&amp;gt;
+/// Travers to the nearest parent with the specified PageTypeID
+/// &amp;lt;/summary&amp;gt;
+public static PageData TraverseTo(this PageData page, int pageTypeID)
+{
+    return GlobalFunctions.TraverseTo(page.PageLink, pageTypeID);
+}
+
+/// &amp;lt;summary&amp;gt;
+/// Travers to the nearest parent with one of the specified PageTypeID's
+/// &amp;lt;/summary&amp;gt;
+public static PageData TraverseTo(this PageData page, int[] pageTypeID)
+{
+    return GlobalFunctions.TraverseTo(page.PageLink, pageTypeID);
+}
+
+/// &amp;lt;summary&amp;gt;
+/// Travers to the nearest parent where specified property has value
+/// &amp;lt;/summary&amp;gt;
+public static PageData TraverseTo(this PageData page, string propertyName)
+{
+    return GlobalFunctions.TraverseTo(page.PageLink, propertyName);
+}
+
+/// &amp;lt;summary&amp;gt;
+/// Recurse to the nearest child with the specified PageTypeID
+/// &amp;lt;/summary&amp;gt;
+public static PageData RecurseTo(this PageData page, int pageTypeID)
+{
+    return GlobalFunctions.RecurseTo(page.PageLink, pageTypeID);
+}
+
+/// &amp;lt;summary&amp;gt;
+/// Recurse to the nearest child with one of the specified PageTypeID's
+/// &amp;lt;/summary&amp;gt;
+public static PageData RecurseTo(this PageData page, int[] pageTypeID)
+{
+    return GlobalFunctions.RecurseTo(page.PageLink, pageTypeID);
+}
+
+/// &amp;lt;summary&amp;gt;
+/// Recurse to the nearest child where specified property has value
+/// &amp;lt;/summary&amp;gt;
+public static PageData RecurseTo(this PageData page, string propertyName)
+{
+    return GlobalFunctions.RecurseTo(page.PageLink, propertyName);
+}
+
+/// &amp;lt;summary&amp;gt;
+/// Checks if the specified value exists in the int array
+/// &amp;lt;/summary&amp;gt;
+public static bool Contains(this int[] ints, int value)
+{
+    foreach (int item in ints)
+    {
+        if (item == value)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}&lt;/pre&gt;
+
+&lt;pre class="brush: csharp;"&gt;namespace DV
+{
+    using EPiServer;
+    using EPiServer.Core;
+
+    public static class GlobalFunctions
+    {
+        public static PageData TraverseTo(PageReference from, int pageTypeID)
+        {
+            return TraverseTo(from, new int[] { pageTypeID });
+        }
+
+        public static PageData TraverseTo(PageReference from, int[] pageTypeID)
+        {
+            if (PageReference.IsNullOrEmpty(from) || from == PageReference.RootPage)
+            {
+                return null;
+            }
+
+            PageData page = DataFactory.Instance.GetPage(from);
+
+            if (pageTypeID.Contains(page.PageTypeID))
+            {
+                return page;
+            }
+            else
+            {
+                return TraverseTo(page.ParentLink, pageTypeID);
+            }
+        }
+
+        public static PageData TraverseTo(PageReference from, string propertyName)
+        {
+            if (PageReference.IsNullOrEmpty(from) || from == PageReference.RootPage)
+            {
+                return null;
+            }
+
+            PageData page = DataFactory.Instance.GetPage(from);
+
+            if (IsValue(page, propertyName))
+            {
+                return page;
+            }
+            else
+            {
+                return TraverseTo(page.ParentLink, propertyName);
+            }
+        }
+
+        public static PageData RecurseTo(PageReference from, int pageTypeID)
+        {
+            return RecurseTo(from, new int[] { pageTypeID });
+        }
+
+        public static PageData RecurseTo(PageReference from, int[] pageTypeID)
+        {
+            PageData page = null;
+
+            if (!PageReference.IsNullOrEmpty(from))
+            {
+                foreach (PageData childPage in DataFactory.Instance.GetChildren(from))
+                {
+                    if (pageTypeID.Contains(childPage.PageTypeID))
+                    {
+                        return childPage;
+                    }
+                    else
+                    {
+                        page = RecurseTo(childPage.PageLink, pageTypeID);
+                    }
+                }
+            }
+
+            return page;
+        }
+
+        public static PageData RecurseTo(PageReference from, string propertyName)
+        {
+            PageData page = null;
+
+            if (!PageReference.IsNullOrEmpty(from))
+            {
+                foreach (PageData childPage in DataFactory.Instance.GetChildren(from))
+                {
+                    if (IsValue(childPage, propertyName))
+                    {
+                        return childPage;
+                    }
+                    else
+                    {
+                        page = RecurseTo(childPage.PageLink, propertyName);
+                    }
+                }
+            }
+
+            return page;
+        }
+    }
+}&lt;/pre&gt;</content>
+  <ispublished>True</ispublished>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2009-11-23 20:42:00</pubDate>
+  <lastModified>2009-11-25 10:37:19</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>some-useful-extension-methods</slug>
+  <tags>
+    <tag>extension method</tag>
+    <tag>pagedata</tag>
+  </tags>
+  <comments />
+  <categories>
+    <category>bf74dc56-651d-4a32-89bf-d757b885fc05</category>
+  </categories>
+  <notifications />
+</post>

@@ -4,13 +4,15 @@
             <a href="@Model.Url" itemprop="url">@Model.Title</a>
         </h1>
         <div>
-            <i class="icon-calendar"></i> <abbr title="@Model.PubDate.ToLocalTime()" itemprop="datePublished">@Model.PubDate.ToLocalTime().ToString("d. MMMM yyyy")</abbr>
-            <i class="icon-comment"></i> @Model.Comments.Count Comments
+            <i class="icon-calendar"></i> <abbr title="@Model.PubDate.ToLocalTime()" itemprop="datePublished">@Model.PubDate.ToLocalTime().ToLongDateString()</abbr>
+            @* <i class="icon-comment"></i> @Model.Comments.Count Comments*@
             @Categories()
         </div>
     </header>
 
-    <div itemprop="articleBody">@Html.Raw(Model.Content)</div>
+    <div itemprop="articleBody">
+        @Html.Raw(Model.Content)
+    </div>
 
     @if (Blog.CurrentPost != null)
     {

@@ -1,0 +1,640 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>Johan</author>
+  <title>Seo tip: canonical domain</title>
+  <description />
+  <content>&lt;p&gt;One really big enhancement is canonical urls for your/customers content. I&amp;rsquo;m sure you all know about the problem with duplicated content, but not everyone tend to fix it. Here&amp;rsquo;s my take on it.&lt;/p&gt;
+&lt;p&gt;[more]&amp;nbsp;&lt;/p&gt;
+&lt;pre class="brush: csharp;"&gt;namespace DV.HttpModules
+{
+    using System;
+    using System.Web;
+
+    public class CanonicalDomainModule : IHttpModule
+    {
+        public delegate void CanonicalDomainEventHandler(UriBuilder url);
+
+        public static event CanonicalDomainEventHandler BeforeChangingDomain;
+        public static event CanonicalDomainEventHandler AfterChangingDomain;
+
+        void IHttpModule.Dispose()
+        {
+
+        }
+
+        void IHttpModule.Init(HttpApplication context)
+        {
+            context.BeginRequest += new EventHandler(this.RedirectDomains);
+        }
+
+        private void RedirectDomains(object sender, EventArgs e)
+        {
+            HttpApplication application = sender as HttpApplication;
+            UriBuilder requestedUrl = new UriBuilder(application.Context.Request.Url);
+
+            string siteHost = EPiServer.Configuration.Settings.Instance.SiteUrl.Host;
+
+            if (!requestedUrl.Host.Equals(siteHost, StringComparison.OrdinalIgnoreCase))
+            {
+                if (BeforeChangingDomain != null)
+                {
+                    BeforeChangingDomain(requestedUrl);
+                }
+
+                requestedUrl.Host = siteHost;
+
+                if (AfterChangingDomain != null)
+                {
+                    AfterChangingDomain(requestedUrl);
+                }
+
+                string location = requestedUrl.Uri.GetComponents(
+                    UriComponents.Scheme |
+                    UriComponents.Host |
+                    UriComponents.Path |
+                    UriComponents.Query |
+                    UriComponents.Fragment,
+                    UriFormat.Unescaped);
+
+                this.PermanentRedirect(application, location);
+            }
+        }
+
+        private void PermanentRedirect(HttpApplication application, string location)
+        {
+            application.Context.Response.Clear();
+            application.Context.Response.Status = "301 Moved Permanently";
+            application.Context.Response.AddHeader("Location", location);
+            application.Context.Response.End();
+        }
+    }
+}&lt;/pre&gt;
+&lt;p&gt;Modules are executed in the order they are configured. So if we register it before EPiServer&amp;rsquo;s UrlRewriteModule the url will not be rewritten when the module is executed, not a big deal in this case, but just remember it.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-10-30 13:46:00</pubDate>
+  <lastModified>2011-12-01 20:50:56</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>seo-tip-canonical-domain</slug>
+  <tags>
+    <tag>seo</tag>
+  </tags>
+  <comments>
+    <comment id="dcc0e658-fedb-4ae4-8e7b-4b8fcb2c6260" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-05-29 22:51:28</date>
+      <author>private consolidation loan</author>
+      <email>marisa_pierce@gmx.net</email>
+      <country />
+      <ip>5.39.119.92</ip>
+      <website>http://www.ooakguild.com/Top100/index.php?a=stats&amp;u=jimmy1561qxle</website>
+      <content>&lt;p&gt;Thanks to all to aid man.&lt;/p&gt;</content>
+    </comment>
+    <comment id="ce6c6575-61c2-4095-9617-eadec841d216" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-05-30 11:20:42</date>
+      <author>g&amp;#252;nstige hotels t&amp;#252;rkei</author>
+      <email>berndnielsen@inbox.com</email>
+      <country />
+      <ip>46.105.63.40</ip>
+      <website>http://www.gpva.net/groups/have-got-a-great-traveling-experience-with-the-following-tips/</website>
+      <content>&lt;p&gt;Your internet log appears pleasant. Have a prestigious day.&lt;/p&gt;</content>
+    </comment>
+    <comment id="b40be7c0-d53c-4da0-bed1-4b4c5a6b4eac" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-05-31 10:25:01</date>
+      <author>More customers for cornwall business</author>
+      <email>erika-lockwood@gmail.com</email>
+      <country />
+      <ip>195.182.22.84</ip>
+      <website>http://www.internetmarketingcornwall.co.uk/seo-services/seo-cornwall.html</website>
+      <content>&lt;p&gt;I like it when individuals come together and share thoughts.&lt;br /&gt;Great site, continue the good work!&lt;/p&gt;</content>
+    </comment>
+    <comment id="ceb6636c-c938-45d3-8508-34407685106f" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-05-31 11:08:37</date>
+      <author>Illinois SEO company</author>
+      <email>roshani12.hardia@gmail.com</email>
+      <country />
+      <ip>124.125.249.57</ip>
+      <website>http://optimizationelites.com/illinois-seo/</website>
+      <content>&lt;p&gt;Very useful and informative post,easily understandable.Thanks for the good post.Keep posting.&lt;/p&gt;</content>
+    </comment>
+    <comment id="be338acb-da17-48cd-868a-6d55b6732dae" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-03 17:32:00</date>
+      <author>Louann</author>
+      <email>louanncomstock@inbox.com</email>
+      <country />
+      <ip>202.91.25.41</ip>
+      <website>http://aspiringgimmick33.jigsy.com/entries/general/house-clearance-solutions-–-cleaning-the-property</website>
+      <content>&lt;p&gt;Wow, wonderful blog layout! How long have you been blogging for?&lt;br /&gt;you made blogging look easy. The overall look of &lt;br /&gt;your website is fantastic, let alone the content!&lt;/p&gt;</content>
+    </comment>
+    <comment id="b8e12c91-9b52-4147-adcf-af2291df57af" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-08 05:16:53</date>
+      <author>talentedor721.livejournal.com</author>
+      <email>debbie.hamrick@gawab.com</email>
+      <country />
+      <ip>189.203.219.114</ip>
+      <website>http://talentedor721.livejournal.com/849.html</website>
+      <content>&lt;p&gt;Hello, I think your website might be having browser compatibility issues.&lt;/p&gt;&lt;p&gt;When I look at your website in Opera, it looks fine but when opening in Internet Explorer,&lt;br /&gt;it has some overlapping. I just wanted to give you &lt;br /&gt;a quick heads up! Other then that, great blog!&lt;/p&gt;</content>
+    </comment>
+    <comment id="753dd2c0-f700-4a0f-a2c3-505d18023854" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-08 23:01:56</date>
+      <author>Kristofer</author>
+      <email>kristoferhutcheson@gmail.com</email>
+      <country />
+      <ip>46.105.75.82</ip>
+      <website>http://namescapes.us/index.php?option=com_blog&amp;view=comments&amp;pid=88704&amp;Itemid=0</website>
+      <content>&lt;p&gt;Hi, I met through the weblog, even though browsing on Google and the initially aid post looks really &lt;br /&gt;overrun to me.&lt;/p&gt;</content>
+    </comment>
+    <comment id="4e7871ae-14c3-44df-a29c-c31b613ba731" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-13 01:11:39</date>
+      <author>wedding hair peterborough</author>
+      <email>alfredchristianson@gmail.com</email>
+      <country />
+      <ip>186.232.113.251</ip>
+      <website>https://message.diigo.com/message/choosing-the-right-mobile-hairdresser-2337018</website>
+      <content>&lt;p&gt;I'm gone to convey my little brother, that he should also visit this blog on regular basis to get updated from latest information.&lt;/p&gt;</content>
+    </comment>
+    <comment id="3ad2ed03-9734-4604-af2f-8275eed34960" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-19 12:38:11</date>
+      <author>Monique</author>
+      <email>moniquemundy@gmx.net</email>
+      <country />
+      <ip>199.47.122.171</ip>
+      <website>http://lamarchrc.sosblogs.com/The-first-blog-b1/Best-Of-All-Though-Is-Seeing-All-The-Minutes-Of-Workout-You-ve-Accumulated-Which-No-Doubt-Will-Also-Show-In-Your-Increasingly-Toned-Body-b1-p5.htm</website>
+      <content>&lt;p&gt;The disadvantages, for illustration, of skipping easy to do.&lt;br /&gt;Therefore, you will be blushing out the drosses legs up allegiance.&lt;/p&gt;&lt;p&gt;In the case that you are in a rut can cause havoc &lt;br /&gt;in your architectural programmes to flatten your ab muscular tissues, so supervise your diet programme nearly.&lt;/p&gt;</content>
+    </comment>
+    <comment id="480ef273-44f1-4f86-8750-6548c15ffd35" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-20 11:57:14</date>
+      <author>Heath</author>
+      <email>heathgarner@gmx.de</email>
+      <country />
+      <ip>62.75.146.21</ip>
+      <website>http://nebulouspaddle166.jigsy.com/entries/general/how-to-go-about-hiring-an-it-assistance-engineer</website>
+      <content>&lt;p&gt;Hi, Neat post. There is an issue with your site in web explorer, might test this?&lt;/p&gt;&lt;p&gt;IE still is the market leader and a huge element of folks will leave out your wonderful writing because of &lt;br /&gt;this problem.&lt;/p&gt;</content>
+    </comment>
+    <comment id="6ab5e95c-2088-4373-99da-6c2db5426487" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-20 18:50:32</date>
+      <author>Stephan</author>
+      <email>stephansmallwood@gmail.com</email>
+      <country />
+      <ip>202.177.165.52</ip>
+      <website>http://greatrainbow3446.jimdo.com/2013/05/23/rubbish-clearance-obtain-all-your-waste-removed/</website>
+      <content>&lt;p&gt;Good day! I simply would like to offer you a big thumbs up for your great info you've got right here on this post. I'll be returning to your blog for more soon.&lt;/p&gt;</content>
+    </comment>
+    <comment id="fe84cd67-a2b8-415a-a7bc-c12b6bf78232" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-24 05:30:36</date>
+      <author>best island vacations for Couples</author>
+      <email>tatianadamron@aol.com</email>
+      <country />
+      <ip>37.59.238.163</ip>
+      <website>http://onlineshop.mein-web24.de/node/31170</website>
+      <content>&lt;p&gt;impressive stuff thanx :)&lt;/p&gt;</content>
+    </comment>
+    <comment id="58a29fda-4c37-4224-9cd5-fad9c00975ee" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-26 02:44:01</date>
+      <author>tattoo removal hitchin</author>
+      <email>ivorycopley@bigstring.com</email>
+      <country />
+      <ip>46.249.66.50</ip>
+      <website>http://www.fizzlive.com/member/290297/blog/view/364010/</website>
+      <content>&lt;p&gt;Hi, this weekend is fastidious in favor of me, for the &lt;br /&gt;reason that this point in time i am reading this great educational article here at my home.&lt;/p&gt;</content>
+    </comment>
+    <comment id="045e3122-467a-4298-bc2e-be91ba46b86b" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-26 21:02:15</date>
+      <author>senuke xcr services</author>
+      <email>adrianacomer@bigstring.com</email>
+      <country />
+      <ip>188.208.2.169</ip>
+      <website>http://fiverr.com/coralbue/create-over-500-links-with-a-senuke-x-campaign</website>
+      <content>&lt;p&gt;Magnificent web site. Lots of helpful info here.&lt;br /&gt;I am sending it to several buddies ans additionally &lt;br /&gt;sharing in delicious. And naturally, thank you to your sweat!&lt;/p&gt;</content>
+    </comment>
+    <comment id="2afd8dfb-f68b-45c8-8e7c-26097934f463" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-06 16:21:39</date>
+      <author>free seo programs</author>
+      <email>vilmaotto@gmail.com</email>
+      <country />
+      <ip>185.3.132.204</ip>
+      <website>http://pierre.morel13.free.fr/2bgal/admin/phpinfo.php?a[]=&lt;a+href=http://promotingawebsite.com&gt;promoting+your+website&lt;/a&gt;</website>
+      <content>&lt;p&gt;Article writing is also a fun, if you be acquainted with after that you &lt;br /&gt;can write or else it is complex to write.&lt;/p&gt;</content>
+    </comment>
+    <comment id="ebbf197f-6220-4b5d-8a48-fad169aa4837" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-09 21:47:56</date>
+      <author>orthotic friendly shoes</author>
+      <email>valentinsnow@freenet.de</email>
+      <country />
+      <ip>188.165.121.249</ip>
+      <website>http://orthoticsinsoles.co.uk/</website>
+      <content>&lt;p&gt;We're a group of volunteers and starting a new scheme in our community. Your web site provided us with valuable info to work on. You have done an impressive job and our whole community will be thankful to you.&lt;/p&gt;</content>
+    </comment>
+    <comment id="318e100a-1218-429b-8ea4-31512cb59aa0" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-14 15:54:14</date>
+      <author>www.runnersoul.com</author>
+      <email>antjehaney@gmail.com</email>
+      <country />
+      <ip>192.80.133.63</ip>
+      <website>http://www.runnersoul.com/forums/index.php?p=/profile/JoseMaldo</website>
+      <content>&lt;p&gt;Just want to say your article is as surprising. The clearness to your post is simply spectacular and that i can &lt;br /&gt;think you're a professional in this subject. Fine together with your permission allow me to clutch your RSS feed to stay updated with coming near near post. Thanks a million and please keep up the rewarding work.&lt;/p&gt;</content>
+    </comment>
+    <comment id="ad4363fc-d036-4f18-85f9-7a9e42b5f20a" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-15 19:36:54</date>
+      <author>Buy 1285 muscle</author>
+      <email>maureen-carvalho@freenet.de</email>
+      <country />
+      <ip>37.72.190.142</ip>
+      <website>http://beauty-by-me.blogspot.fr/2011/03/online-shopping-strawberrynet.html?m=1</website>
+      <content>&lt;p&gt;Hurrah, that's what I was searching for, what a information! present here at this weblog, thanks admin of this web site.&lt;/p&gt;</content>
+    </comment>
+    <comment id="1108907b-7d24-4af5-bb14-5e5cba3d79f7" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-17 11:15:32</date>
+      <author>Susanne</author>
+      <email>susannevillarreal@gmail.com</email>
+      <country />
+      <ip>208.73.23.133</ip>
+      <website>http://www.birdsoft.biz/forums/profile.php?mode=viewprofile&amp;u=48565</website>
+      <content>&lt;p&gt;Hey there would you mind letting me know &lt;br /&gt;which hosting company you're using? I've loaded your blog and shock &lt;br /&gt;rock bands (Susanne) in 3 different browsers and I must &lt;br /&gt;say this blog loads a lot quicker then most.&lt;br /&gt;Can you suggest a good hosting provider at a fair price?&lt;br /&gt;Thanks a lot, I appreciate it!&lt;/p&gt;</content>
+    </comment>
+    <comment id="4c8b8f87-22da-44ad-a7e0-234bc19d292c" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-18 17:20:21</date>
+      <author>design your own home</author>
+      <email>lanmoten@gmail.com</email>
+      <country />
+      <ip>37.59.4.66</ip>
+      <website>http://poshtoshbaby.com/Top100/index.php?a=stats&amp;u=miguelchaffin</website>
+      <content>&lt;p&gt;Howdy what entice you to post an post. This article was super diverting, &lt;br /&gt;in particular considering the fact that I was seeking for &lt;br /&gt;thoughts on this study final Thursday.&lt;/p&gt;</content>
+    </comment>
+    <comment id="8d922ce3-c587-461c-b257-3c6f969fd69a" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-18 22:07:09</date>
+      <author>sitio web</author>
+      <email>adelaidaprince@t-online.de</email>
+      <country />
+      <ip>74.221.219.183</ip>
+      <website>http://www.sylverblog.com/</website>
+      <content>&lt;p&gt;Wonderful items from you, man. I've consider your stuff prior to and you are just too excellent. I actually like what you have bought here, certainly like what you're saying and the &lt;br /&gt;way in which you are saying it. You're making it entertaining and you continue to take care of to keep it wise. I can't wait to learn much more from you.&lt;/p&gt;&lt;p&gt;That is actually a tremendous web site.&lt;/p&gt;</content>
+    </comment>
+    <comment id="a1be7ecd-2b44-4512-bccb-ff9ad7c536a5" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-20 05:53:57</date>
+      <author>Moises</author>
+      <email>moises-tuggle@gmail.com</email>
+      <country />
+      <ip>177.220.130.68</ip>
+      <website>http://www.house-cleanup.co.uk/2012/08/14/house-clearance-services-cleaning-your-home/</website>
+      <content>&lt;p&gt;I need to to thank you for this excellent read!&lt;br /&gt;! I definitely loved every little bit of it. I have you saved as a favorite &lt;br /&gt;to look at new stuff you post…&lt;/p&gt;</content>
+    </comment>
+    <comment id="5d961765-abc9-4e87-940c-68e3fd769925" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-20 08:43:21</date>
+      <author>offshore senuke xcr hosting</author>
+      <email>jeanette_davenport@gmail.com</email>
+      <country />
+      <ip>201.8.108.240</ip>
+      <website>http://senukexcrhosting.com/</website>
+      <content>&lt;p&gt;adsense&lt;em&gt;ad&lt;/em&gt;unit += '&lt;/p&gt;</content>
+    </comment>
+    <comment id="33702445-7902-43f9-928c-386673fdc83d" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-24 19:50:23</date>
+      <author>Visitar Pagina</author>
+      <email>ismael_casillas@peacemail.com</email>
+      <country />
+      <ip>188.165.120.117</ip>
+      <website>http://opcionesbinariasespana.tumblr.com/</website>
+      <content>&lt;p&gt;Marvelous, what a blog it is! This web site provides useful information to us, keep &lt;br /&gt;it up.&lt;/p&gt;</content>
+    </comment>
+    <comment id="43f8fe2d-0cad-44f3-ba86-183c4545b7ff" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-27 03:23:05</date>
+      <author>garden clearance Enfield</author>
+      <email>malcolm_diehl@freenet.de</email>
+      <country />
+      <ip>200.195.141.178</ip>
+      <website>http://www.garden-maintenance.org.uk/2012/08/17/garden-clearance/</website>
+      <content>&lt;p&gt;I am sure this post has touched all the internet viewers, its really really pleasant post on building up &lt;br /&gt;new web site.&lt;/p&gt;</content>
+    </comment>
+    <comment id="54afb88c-c966-4bfd-b070-24c46f06556f" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-08-02 10:20:33</date>
+      <author>hair removal stevenage</author>
+      <email>cory-mcclintock@animail.net</email>
+      <country />
+      <ip>176.100.14.16</ip>
+      <website>http://quickaffec199.livejournal.com/2100.html</website>
+      <content>&lt;p&gt;It's very straightforward to find out any matter on net as compared to books, as I found this paragraph at this web page.&lt;/p&gt;</content>
+    </comment>
+    <comment id="50d03af2-b8e3-44a9-a845-db8057fe3230" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-08-03 05:58:55</date>
+      <author>Work At Home Ideas</author>
+      <email>tonycochrane@gmail.com</email>
+      <country />
+      <ip>178.63.199.143</ip>
+      <website>http://dblab.kangwon.ac.kr/?document_srl=179460</website>
+      <content>&lt;p&gt;Hey, quite Nice diary! Man .. Gorgeous .. impressive .. I bookmark your blog,&lt;br /&gt;and also take the feeds ...&lt;/p&gt;</content>
+    </comment>
+    <comment id="e31d136f-6ace-4add-9e3d-106847459778" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-08-03 12:24:31</date>
+      <author>uk seo reviews</author>
+      <email>leticia-bivins@gmail.com</email>
+      <country />
+      <ip>188.240.140.171</ip>
+      <website>http://www.seoukreviews.co.uk/</website>
+      <content>&lt;p&gt;Thank you for a really good commentary on Search engine marketing, and even absolutely love video reflection among &lt;br /&gt;the infographic in the actually works.&lt;br /&gt;The truth that realty became one of these nastiest small businesses following through on web 2 together with subject material promoting and &lt;br /&gt;marketing. Inside of their blogposts and furthermore forums, professionals &lt;br /&gt;you could try over-time to get rid of their professional services alternatively tell each other regarding triumphs &lt;br /&gt;that barefoot running causes individuals take a look nasty.&lt;br /&gt;In truth this traffic need no cost, superior quality help and advice.&lt;/p&gt;&lt;p&gt;They need to discover about places, neighborhoods, &lt;br /&gt;all the buying process, or maybe a generate an investment vehicle.&lt;br /&gt;I agree of the fact that easiest way to make money requires you &lt;br /&gt;to grant audience what they aspire to: extra instructing much less marketing.&lt;/p&gt;</content>
+    </comment>
+    <comment id="05c0c5f8-2ba0-4f26-b33b-cbc36d40118b" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-08-05 21:06:40</date>
+      <author>Stephaine</author>
+      <email>stephaineshea@web.de</email>
+      <country />
+      <ip>177.135.179.117</ip>
+      <website>http://www.builders-yard.co.uk/2012/08/15/the-definitive-skip-hire-guide/</website>
+      <content>&lt;p&gt;Tremendous things here. I'm very satisfied to see your post. Thank you a lot and I am taking a look forward to contact you. Will you please drop me a mail?&lt;/p&gt;</content>
+    </comment>
+    <comment id="1ff7f4ea-ef25-494a-9250-d240b70396b3" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-08-22 09:39:27</date>
+      <author>www.holyvision.edu.np</author>
+      <email>charis.carranza@arcor.de</email>
+      <country />
+      <ip>199.119.225.49</ip>
+      <website>http://www.holyvision.edu.np/blog/index.php?a=member&amp;m=1741</website>
+      <content>&lt;p&gt;Good answers in return of this difficulty with &lt;br /&gt;solid arguments and describing everything concerning that.&lt;/p&gt;</content>
+    </comment>
+    <comment id="69b90505-bcb7-463f-9f95-cbf469ac75db" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-08-28 18:38:00</date>
+      <author>http://www.ranzeweh.ch/index.php?option=com_easygb&amp;amp;&amp;amp;Itemid=4</author>
+      <email>ursulamendoza@gmx.de</email>
+      <country />
+      <ip>176.31.22.230</ip>
+      <website>http://www.ranzeweh.ch/index.php?option=com_easygb&amp;&amp;Itemid=4</website>
+      <content>&lt;p&gt;Hi there! Would you mind if I share your blog with my twitter group?&lt;br /&gt;There's a lot of folks that I think would really appreciate your content. Please let me know. Many thanks&lt;/p&gt;</content>
+    </comment>
+    <comment id="d0325119-9ac4-471b-a81d-54ccae40a2b5" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-10 06:47:14</date>
+      <author>booksmarks1002.org</author>
+      <email>trackback</email>
+      <country />
+      <ip>184.173.107.17</ip>
+      <website>http://booksmarks1002.org/story.php?id=46641</website>
+      <content>Döda vinkeln — Seo tip: canonical domain
+
+Hence, you can combine your actual arms or chest physical exercise day with trapezius course day too.  As everyone know, proteins are the inspiration of body muscles. They help which can regulate muscle function and fluid balance. The supplement provides hard work and strength for working out.</content>
+    </comment>
+    <comment id="96bdb888-4161-485f-904a-d25fa55f3a1c" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-24 05:58:15</date>
+      <author>Misti Keppler</author>
+      <email>wmutaesv@gmail.com</email>
+      <country />
+      <ip>177.207.240.61</ip>
+      <website>http://my.telegraph.co.uk/areyeastinfectionscontagious/</website>
+      <content>&lt;p&gt;hello!,I love your writing very much! proportion we be in contact more about your post on AOL? I require a specialist on this area to solve my problem. Maybe that is you! Looking forward to look you.&lt;/p&gt;</content>
+    </comment>
+    <comment id="891f35b8-3ea6-496d-8127-2a563361b178" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-25 08:07:18</date>
+      <author>Is Senuke Good</author>
+      <email>lacyweiner@t-online.de</email>
+      <country />
+      <ip>50.117.68.213</ip>
+      <website>http://www.senukexrumer.com/</website>
+      <content>&lt;p&gt;It even goes as much as to inform you if they are easy or probably challenging to rank for online Google and then you can determine which approach &lt;br /&gt;to decide on. Downloading is the procedure of copying a file such as the best senuke services from 1 computer to an additional about the internet.&lt;br /&gt;Such advertising has become known as viral - it literally spreads like a virus; this is one of the biggest benefits to using SEnuke sites.&lt;/p&gt;</content>
+    </comment>
+    <comment id="6741267b-e623-4370-859f-233680a73623" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-25 08:33:19</date>
+      <author>immobilier</author>
+      <email>winfred_reddall@googlemail.com</email>
+      <country />
+      <ip>216.172.141.151</ip>
+      <website>http://www.frenchproperty1.com/</website>
+      <content>&lt;p&gt;Greetings! I've been reading your blog for some time &lt;br /&gt;now and finally got the bravery to go ahead &lt;br /&gt;and give you a shout out from Humble Tx! Just wanted to tell you keep up &lt;br /&gt;the great job!&lt;/p&gt;</content>
+    </comment>
+    <comment id="4b7d7f3f-9341-4748-82fd-ad181f032a10" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-26 00:26:00</date>
+      <author>web site</author>
+      <email>eviebinns@yahoo.com</email>
+      <country />
+      <ip>216.172.141.190</ip>
+      <website>http://www.katzen-lexikon.de/Benutzer:GayeMoench</website>
+      <content>&lt;p&gt;Its like you read my mind! You appear to grasp a lot about this, like you wrote the &lt;br /&gt;e book in it or something. I feel that you just could do with some percent to pressure the message house a little bit, &lt;br /&gt;however other than that, that is wonderful blog. An excellent read.&lt;br /&gt;I will certainly be back.&lt;/p&gt;</content>
+    </comment>
+    <comment id="165a4137-4b4c-4cfd-a171-d971edccc0c3" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-27 23:50:41</date>
+      <author>webpage</author>
+      <email>taylor.pointer@gmail.com</email>
+      <country />
+      <ip>50.117.46.250</ip>
+      <website>http://www.hyuninngallery.com/?document_srl=25925</website>
+      <content>&lt;p&gt;Switchfast offers IT solutions that meet your needs while taking care &lt;br /&gt;of your business. The key is to make these relevent to each page of your site.&lt;/p&gt;&lt;p&gt;No more worrying about the ranking of your page wit affordable SEO services.&lt;/p&gt;</content>
+    </comment>
+    <comment id="721c022e-bd63-4a76-87b2-44be8dd7b5aa" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-28 07:37:32</date>
+      <author>property france</author>
+      <email>graig_creighton@gmail.com</email>
+      <country />
+      <ip>69.46.77.155</ip>
+      <website>http://frenchproperty1.com.radabg.com/url/frenchproperty1.com/</website>
+      <content>&lt;p&gt;Wow, this paragraph is fastidious, my sister is analyzing these things, so I am going to inform her.&lt;/p&gt;</content>
+    </comment>
+    <comment id="be87f807-1867-41e2-8292-4d7676c160b0" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-29 22:18:29</date>
+      <author>Carson</author>
+      <email>carsonpassmore@t-online.de</email>
+      <country />
+      <ip>190.228.71.98</ip>
+      <website>http://www.youtube.com/watch?v=f3nOpKtVf-E</website>
+      <content>&lt;p&gt;I like what you guys aree usually up too. Such clever work and exposure!&lt;br /&gt;Keep up the terrific works guys I've included you guys to my blogroll.&lt;/p&gt;</content>
+    </comment>
+    <comment id="2162a0b7-cf27-4962-9912-e3df10a65064" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-01 02:33:41</date>
+      <author>senuke review senuke xcr</author>
+      <email>aguedalim@gmail.com</email>
+      <country />
+      <ip>216.172.141.158</ip>
+      <website>http://www.graniteowners.com/member.php?u=4913-MMQMikayl</website>
+      <content>&lt;p&gt;I am actually grateful to the holder of this site who has shared &lt;br /&gt;this fantastic piece of writing at at this place.&lt;/p&gt;</content>
+    </comment>
+    <comment id="87328fa5-de8a-4422-aeac-c73d84c73bdc" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-03 01:59:45</date>
+      <author>affordable seo software</author>
+      <email>zulma.teichelmann@gawab.com</email>
+      <country />
+      <ip>69.46.81.143</ip>
+      <website>http://ikjf.co.kr/xe/?document_srl=189985</website>
+      <content>&lt;p&gt;Swithfast offers IT solutions that meeet your &lt;br /&gt;needs while taking care of your business. A: These services are pioneers in the &lt;br /&gt;hyper local space and are currently bridging the gap where large search engines &lt;br /&gt;do not produce the best data. SEO experts suggest &lt;br /&gt;going for 10-20 keywords per lens.&lt;/p&gt;</content>
+    </comment>
+    <comment id="68ba043d-69cd-4e04-966a-e6d71569b4db" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-04 04:29:34</date>
+      <author>wifi hack tool</author>
+      <email>roseann_stratton@googlemail.com</email>
+      <country />
+      <ip>188.165.155.234</ip>
+      <website>http://wifihacker24.blogspot.com/</website>
+      <content>&lt;p&gt;Number 2 on the list, Bonte Cafe ( is a new entry &lt;br /&gt;that I had the pleasure of visiting yesterday. This gadget is principally a portable video system that's had quite a lot of &lt;br /&gt;features added on high the basics for such a device.&lt;br /&gt;Remember that the wireless network can be accessed from &lt;br /&gt;within a 25-30m radius.&lt;/p&gt;</content>
+    </comment>
+    <comment id="8877677d-f42b-4ce8-9223-5b42ac4a030b" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-05 09:47:09</date>
+      <author>Signe</author>
+      <email>torstenstillings@gmail.com</email>
+      <country />
+      <ip>37.59.189.247</ip>
+      <website>http://www.punkinfestival.com/?p=92</website>
+      <content>&lt;p&gt;I have been surfing online more than three hours nowadays, &lt;br /&gt;but I by no means discovered any fascinating article like yours.&lt;br /&gt;It is pretty value sufficient for me. In my opinion, if all site owners and bloggers made &lt;br /&gt;excellent content material as you did, the web will be a lot more helpful than ever before.&lt;/p&gt;</content>
+    </comment>
+    <comment id="959e9f48-f435-4b6e-be77-0c8cd95f0805" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-05 12:50:58</date>
+      <author>web hosting {{plan|plans}|{service|services}|</author>
+      <email>celestaabercrombie@web.de</email>
+      <country />
+      <ip>124.81.226.210</ip>
+      <website>http://www.thebestwebhostingplans.com/</website>
+      <content>&lt;p&gt;Oh my goodness! Amazing article dude! Many thanks, However &lt;br /&gt;I am going through troubles with your RSS. I don't know why I can't join it.&lt;/p&gt;&lt;p&gt;Is there anybody else having similar RSS issues? Anyone that knows the answer will you kindly respond?&lt;/p&gt;&lt;p&gt;Thanx!!&lt;/p&gt;</content>
+    </comment>
+    <comment id="417bb585-73db-43dd-9c92-404ad5bbfd9a" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-07 13:41:02</date>
+      <author>Winifred</author>
+      <email>winifredmayorga@yahoo.de</email>
+      <country />
+      <ip>141.255.163.101</ip>
+      <website>http://uengine.org:8088/wiki/index.php/사용자:OfeliaCantara</website>
+      <content>&lt;p&gt;I'm amazed, I have to admit. Seldom do I encounter a blog that's equally educative and entertaining, and &lt;br /&gt;without a doubt, you've hit the nail on the head.&lt;br /&gt;The issue is an issue that too few men and women are speaking intelligently about.&lt;br /&gt;I am very happy I found this in my hunt for something concerning this.&lt;/p&gt;</content>
+    </comment>
+    <comment id="28e3454d-348d-4682-922e-0e7d8323f97e" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-07 20:47:33</date>
+      <author>stairlifts</author>
+      <email>gudrun.sanford@gmx.net</email>
+      <country />
+      <ip>188.165.33.20</ip>
+      <website>http://www.chungguha.com/?document_srl=326323</website>
+      <content>&lt;p&gt;Hello there! Do you know if they make any plugins to safeguard against hackers?&lt;br /&gt;I'm kinda paranoid about losing everything I've worked hard on.&lt;br /&gt;Any tips?&lt;/p&gt;</content>
+    </comment>
+    <comment id="9ae596f6-904c-4cf1-a1bb-dd8d795f22d8" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-08 12:51:25</date>
+      <author>Paleo Smoothie Recipes</author>
+      <email>lilla.tramel@googlemail.com</email>
+      <country />
+      <ip>64.187.233.158</ip>
+      <website>http://www.pi-er.ca/</website>
+      <content>&lt;p&gt;I am regular visitor, how are you everybody?&lt;br /&gt;This paragraph posted at this site is truly good.&lt;/p&gt;</content>
+    </comment>
+    <comment id="1d052f6c-8020-4dbf-b19d-df2a7c5f11c5" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-08 15:11:26</date>
+      <author>netent free spins</author>
+      <email>mckinley-capehart@inbox.com</email>
+      <country />
+      <ip>31.6.71.170</ip>
+      <website>http://freespins.webeden.co.uk/</website>
+      <content>&lt;p&gt;Good way of telling, and fastidious paragraph to get data about my presentation subject &lt;br /&gt;matter, which i am going to convey in school.&lt;/p&gt;</content>
+    </comment>
+    <comment id="0a0cd352-7873-453c-9c55-05594f617183" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-08 21:31:02</date>
+      <author>Jake</author>
+      <email>torstenisaacs@gmail.com</email>
+      <country />
+      <ip>190.233.4.188</ip>
+      <website>http://clcrockcliffe.ca/en/content/what-accomplice-legal-responsibleness-your-beliefs</website>
+      <content>&lt;p&gt;Pretty component to content. I simply stumbled upon your web site and in accession capital &lt;br /&gt;to claim that I geet in fact loved account your weblog posts.&lt;br /&gt;Any way I'll be subscribing in your augment and even I achievement you get entry to consistently fast.&lt;/p&gt;</content>
+    </comment>
+    <comment id="09c00707-bd42-494b-87ac-98b4da00caa5" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-08 23:17:01</date>
+      <author>Della</author>
+      <email>dellabrooke@t-online.de</email>
+      <country />
+      <ip>212.156.83.10</ip>
+      <website>http://devenir-bh.com/gollumelite/</website>
+      <content>&lt;p&gt;When you are marketing a service online, make &lt;br /&gt;sure thast your website represents your business well.&lt;br /&gt;I can guarantee that on any given day outside of Christmas, my Facrbook newsfeed will &lt;br /&gt;be rife with wedding photos, puppies, and majestic &lt;br /&gt;views. for over a year for your parents - you don't need the.&lt;/p&gt;</content>
+    </comment>
+    <comment id="05c7152f-1594-4c9c-ae68-e0df4ea17d01" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-09 04:32:07</date>
+      <author>Where To Buy Senuke</author>
+      <email>lethawelch@gmail.com</email>
+      <country />
+      <ip>216.172.145.139</ip>
+      <website>http://piperjsho.bloguedoido.com/?__hsc</website>
+      <content>&lt;p&gt;Haven't earned a single dollar and have concluded that it costs &lt;br /&gt;money in order to make the millions possible, and I mean more than just the cost of a &lt;br /&gt;domain name. Even with the introduction of the world-wide-web and the e-commerce that is going on in the cyberworld,&lt;br /&gt;most people today are even now pretty skeptical in excess of &lt;br /&gt;carrying out organization transactions on the internet, these kinds of as procuring, particularly that there are reports when it comes to on line &lt;br /&gt;security being breached by hackers who bank on &lt;br /&gt;the chance of creating millions out of stealing on line. com, when I typed &lt;br /&gt;three alternate options for just about every sentence.&lt;/p&gt;</content>
+    </comment>
+    <comment id="5f3fa451-024c-49a0-9712-be70db82943b" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-09 04:42:24</date>
+      <author>free prepaid phones</author>
+      <email>sidneymaple@gmail.com</email>
+      <country />
+      <ip>192.161.175.92</ip>
+      <website>http://strangetablewar52.newsvine.com/_news/2013/10/05/20832930-save-money-with-prepaid-phone-company-straight-talk</website>
+      <content>&lt;p&gt;It is important not to let the salt water dry on the phone because it will leave salt deposits behind that will cause the phone not &lt;br /&gt;to work. Now you can have money to spare for that Samsung Galaxy phone or any of those those T-Mobile G1 Android Cell Phones, Verizon cell phones or Sprint cell phones you want.&lt;/p&gt;&lt;p&gt;The reason is that that the impairment doesn't derive from holding the phone.&lt;/p&gt;</content>
+    </comment>
+    <comment id="25be5bc5-e861-4ef7-b72e-436574549335" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-09 09:39:34</date>
+      <author>Brandon</author>
+      <email>richie-coffelt@inbox.com</email>
+      <country />
+      <ip>209.141.34.157</ip>
+      <website>http://15.xg4ken.com/media/redir.php?prof=88&amp;camp=8775&amp;affcode=kw24233916&amp;cid=2283077283&amp;mType=b&amp;queryStr=cross trainer&amp;url[]=http://jacksinternetblog.tumblr.com</website>
+      <content>&lt;p&gt;Normally I do not read post on blogs, but I wish to say that this write-up very &lt;br /&gt;compelled me to check out and do so! Your writing taste has been amazed me.&lt;br /&gt;Thank you, quite great post.&lt;/p&gt;</content>
+    </comment>
+    <comment id="13a0cea6-156e-4cbb-b68c-bd32fe649f44" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-10 03:53:15</date>
+      <author>The Set And Forget System Review</author>
+      <email>dakotamcintosh@t-online.de</email>
+      <country />
+      <ip>209.222.14.88</ip>
+      <website>http://webmasterdailydeals.com/don't-think-of-buying-the-set-and-forget-system-review/</website>
+      <content>&lt;p&gt;It's very trouble-free to find out any topic on net as compared to textbooks, as I found this paragraph at this site.&lt;/p&gt;</content>
+    </comment>
+    <comment id="aacbe2ed-90ae-428e-8cfb-fac1e9c54dfa" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-10 06:36:04</date>
+      <author>perception Kayaks sport 12.5 Feet</author>
+      <email>teodoroweinman@gmail.com</email>
+      <country />
+      <ip>198.143.162.164</ip>
+      <website>http://wapvnpro.net/blog/6638/anantara-desert-islands-oasis-kayak/</website>
+      <content>&lt;p&gt;Hurrah! Ater all I got a weblog from where I know how to &lt;br /&gt;actually obtain useful information cncerning my study and knowledge.&lt;/p&gt;</content>
+    </comment>
+    <comment id="12672f21-7ea1-469a-a2a9-48d03a1459c9" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-11 01:32:22</date>
+      <author>Cheap Ghd MK4 Pink Styler</author>
+      <email>vivienriegel@hotmail.de</email>
+      <country />
+      <ip>198.143.144.54</ip>
+      <website>http://www.wible.co.uk/cheap-ghd-mk4-pink-styler-discount.html</website>
+      <content>&lt;p&gt;This is very interesting, You're a very skilled blogger.&lt;br /&gt;I've joined your feed and look forward to seeking more of &lt;br /&gt;your great post. Also, I've shared your website in my social networks!&lt;/p&gt;</content>
+    </comment>
+    <comment id="f4438585-a3fa-4119-a291-1d4637097177" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-11 02:17:17</date>
+      <author>home remedies for kidney stones</author>
+      <email>harrison.zhang@gmail.com</email>
+      <country />
+      <ip>220.255.2.74</ip>
+      <website>http://youtu.be/joFd4HsK1OE</website>
+      <content>&lt;p&gt;This is really attention-grabbing, You're an overly skilled blogger.&lt;br /&gt;I have joined your rss feed and stay up for seeking extra of your excellent post.&lt;br /&gt;Additionally, I've shared your website in my social networks&lt;/p&gt;</content>
+    </comment>
+    <comment id="920e9758-1bd9-4187-8a22-1915b92c52e9" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-11 18:40:04</date>
+      <author>homepage</author>
+      <email>loreenlutz@yahoo.com</email>
+      <country />
+      <ip>184.154.33.110</ip>
+      <website>http://www.youtube.com/watch?v=sx1sXRGvXRg</website>
+      <content>&lt;p&gt;Teach them how to call lines and be confident, but not cocky.&lt;br /&gt;Her cheating gives her an advantage in all her gambling deeds.&lt;/p&gt;&lt;p&gt;On December 29, 2012 is the presently projected release on parole date for Walter 'Wally' Anderson, 58 years old and inmate register # &lt;br /&gt;27981-016, who's currently incarcerated in the medium security Federal Correctional Institution &lt;br /&gt;in Fairton, New Jersey.&lt;/p&gt;</content>
+    </comment>
+    <comment id="82f2afde-8a23-411f-b103-df7c83911f69" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-13 00:11:49</date>
+      <author>gta v telecharger</author>
+      <email>aidanfenton@googlemail.com</email>
+      <country />
+      <ip>95.154.199.220</ip>
+      <website>http://gtavtelechargergratuit.blogspot.com/</website>
+      <content>&lt;p&gt;Unfortunately, the Grand Theft Auto Online section is relatively &lt;br /&gt;sparse since it will not be launching until Oct.&lt;br /&gt;You can escape from them by hiding behind infrastructure or physical items, such as &lt;br /&gt;trash cans. Grand Theft Auto V: The Manual is described by Rockstar as containing "100 pages covering everything from Game Controls, and Features to a tour through the local neighborhoods and activities across Los Santos and Blaine County - plus a special interactive version of the game map to zoom in and explore.&lt;/p&gt;</content>
+    </comment>
+    <comment id="25ffc8c1-e802-449c-acbe-51c0af266807" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-13 09:50:10</date>
+      <author>camel toe</author>
+      <email>margueriteprimrose@gmail.com</email>
+      <country />
+      <ip>110.77.217.22</ip>
+      <website>http://gayassworld.com/2010/07/05/gay-boys-make-a-sticky-creampie/</website>
+      <content>&lt;p&gt;I am extremely impressed with your writing skills and also with the layout on your blog.&lt;br /&gt;Is this a paid theme or did you customize it yourself?&lt;br /&gt;Either way keep up the nice quality writing, it is rare &lt;br /&gt;to see a great blog like this one nowadays.&lt;/p&gt;</content>
+    </comment>
+    <comment id="b192c056-4ab4-47a7-bb59-15e1727461d6" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-10-13 11:45:45</date>
+      <author>http://winrarpasswordremover24.blogspot.com</author>
+      <email>romainerafferty@googlemail.com</email>
+      <country />
+      <ip>94.23.172.5</ip>
+      <website>http://wiki.juenger.com/index.php/Benutzer:ShannaVangundy</website>
+      <content>&lt;p&gt;On February 27th she tweeted, " #thelyinggame has amazing fans. Thank goodness, because seeing Floe's iceberg shrink is actually kind of scary. You should for sure check it out if you are really looking for new Wii games for kids.&lt;/p&gt;</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>bf74dc56-651d-4a32-89bf-d757b885fc05</category>
+  </categories>
+  <notifications />
+</post>

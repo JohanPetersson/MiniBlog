@@ -1,0 +1,324 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>johan</author>
+  <title>Base class for user controls that handles CurrentPage in PageList</title>
+  <description />
+  <content>&lt;p&gt;If you add an EPiServer Property control to the PageLists ItemTemplate it handles &lt;strong&gt;CurrentPage&lt;/strong&gt; as expected, you can also get the &lt;strong&gt;CurrentPage&lt;/strong&gt; by the binding expression:&lt;/p&gt;  &lt;pre class="brush: csharp;"&gt;&amp;lt;%# Container.CurrentPage %&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;Lets say you have an user control (.ascx) in the ItemTemplate instead, then the &lt;strong&gt;CurrentPage&lt;/strong&gt; will be the actual page the PageList control is added to. We can workaround this by having a property in our user control and set it to &lt;em&gt;Container.CurrentPage.PageLink&lt;/em&gt; and set each Property’s PageLink to it, but let’s make it a little bit more sophisticated. &lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;CurrentPage&lt;/strong&gt; is resolved by implementing &lt;em&gt;IPageSource&lt;/em&gt; or &lt;em&gt;ICurrentPage&lt;/em&gt;. But how do we implement them?&lt;/p&gt;
+
+&lt;p&gt;[more]&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;IPageSource&lt;/em&gt; has one property and two methods which needs to be implemented.&lt;/p&gt;
+
+&lt;pre class="brush: csharp;"&gt;PageData CurrentPage { get; } 
+PageDataCollection GetChildren(PageReference pageLink); 
+PageData GetPage(PageReference pageLink);&lt;/pre&gt;
+
+&lt;p&gt;One way is to implement &lt;em&gt;IPageControl&lt;/em&gt; that has the property &lt;strong&gt;PageSource&lt;/strong&gt; which is of the type &lt;em&gt;IPageSource&lt;/em&gt;. Then can we use that property when implementing the &lt;em&gt;IPageSource&lt;/em&gt; methods and properties.&lt;/p&gt;
+
+&lt;p&gt;In our case we need to find the nearest control that implements &lt;em&gt;IPageSource&lt;/em&gt; itself.&lt;/p&gt;
+
+&lt;pre class="brush: csharp;"&gt;public IPageSource PageSource
+{
+    get
+    {
+        if (this._pageSource == null)
+        {
+            this._pageSource = this.NamingContainer as IPageSource;
+
+            if (this._pageSource == null)
+            {
+                this._pageSource = this.Page as IPageSource;
+            }
+
+            if (this._pageSource == null)
+            {
+                this._pageSource = DataFactory.Instance;
+            }
+        }
+
+        return this._pageSource;
+    }
+    set
+    {
+        this._pageSource = value;
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;In this case we’re looking at the &lt;em&gt;NamingContainer&lt;/em&gt;, we could also traverse the control tree even further.&lt;/p&gt;
+
+&lt;p&gt;Now can we implement our &lt;strong&gt;CurrentPage&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;pre class="brush: csharp;"&gt;public PageData CurrentPage
+{
+    get
+    {
+        return this.PageSource.CurrentPage;
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;This is essentially what we need, but let’s implement all methods and properties. EPiServers default base class for user controls also have some other useful methods, so let’s add them too. This is the complete code:&lt;/p&gt;
+
+&lt;pre class="brush: csharp;"&gt;namespace DV
+{
+    using System.Web.UI;
+    using EPiServer;
+    using EPiServer.Core;
+    using EPiServer.Web.WebControls;
+
+    public class UserControlContainer : UserControl, IPageControl, IPageSource
+    {
+        #region Member variables
+
+        private IPageSource _pageSource;
+
+        private PageReference _pageLink;
+
+        private PageBase _page;
+
+        #endregion
+
+        #region IPageControl Members
+
+        public PageReference PageLink
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(this.PageLinkProperty) &amp;amp;&amp;amp; PageReference.IsNullOrEmpty(this._pageLink))
+                {
+                    PageReference reference;
+
+                    if (this.CurrentPage.Property.TryGetValue&amp;lt;PageReference&amp;gt;(this.PageLinkProperty, out reference))
+                    {
+                        this._pageLink = reference;
+                    }
+                    else
+                    {
+                        this._pageLink = PageReference.EmptyReference;
+                    }
+                }
+
+                return this._pageLink;
+            }
+            set
+            {
+                this._pageLink = value;
+            }
+        }
+
+        public string PageLinkProperty { get; set; }
+
+        public IPageSource PageSource
+        {
+            get
+            {
+                if (this._pageSource == null)
+                {
+                    this._pageSource = this.NamingContainer as IPageSource;
+
+                    if (this._pageSource == null)
+                    {
+                        this._pageSource = this.Page as IPageSource;
+                    }
+
+                    if (this._pageSource == null)
+                    {
+                        this._pageSource = DataFactory.Instance;
+                    }
+                }
+
+                return this._pageSource;
+            }
+            set
+            {
+                this._pageSource = value;
+            }
+        }
+
+        #endregion
+
+        #region IPageSource Members
+
+        public PageData CurrentPage
+        {
+            get
+            {
+                return this.PageSource.CurrentPage;
+            }
+        }
+
+        public PageDataCollection GetChildren(PageReference pageLink)
+        {
+            return this.PageSource.GetChildren(pageLink);
+        }
+
+        public PageData GetPage(PageReference pageLink)
+        {
+            return this.PageSource.GetPage(pageLink);
+        }
+
+        #endregion
+
+        public UserControlContainer()
+        {
+        }
+
+        public PageBase PageBase
+        {
+            get
+            {
+                if (this._page == null)
+                {
+                    this._page = this.Page as PageBase;
+
+                    if (this._page != null)
+                    {
+                        return this._page;
+                    }
+
+                    this._page = this.Context.Handler as PageBase;
+
+                    if (this._page == null)
+                    {
+                        throw new EPiServerException(&amp;quot;This user control must be placed on an ASPX-page that inherits from EPiServer.PageBase&amp;quot;);
+                    }
+                }
+
+                return this._page;
+            }
+        }
+
+        public PageData ContainerPage
+        {
+            get
+            {
+                return this.PageBase.CurrentPage;
+            }
+        }
+
+        public bool IsValue(string propertyName)
+        {
+            return this.CurrentPage[propertyName] != null;
+        }
+
+        public string Translate(string key)
+        {
+            return this.PageBase.Translate(key);
+        }
+
+        public string TranslateForScript(string key)
+        {
+            return this.PageBase.TranslateForScript(key);
+        }
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;Now can we add a user control to a PageList:&lt;/p&gt;
+
+&lt;pre class="brush: html;"&gt;&amp;lt;NetR:PageList AutoBind=&amp;quot;true&amp;quot; PageLink=&amp;quot;3&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+	&amp;lt;ItemTemplate&amp;gt;
+		&amp;lt;units:Example runat=&amp;quot;server&amp;quot; /&amp;gt;
+	&amp;lt;/ItemTemplate&amp;gt;
+&amp;lt;/NetR:PageList&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;And in our user control we can add Property controls as usual without needing to set each controls PageLink property:&lt;/p&gt;
+
+&lt;pre class="brush: html;"&gt;&amp;lt;%@ Control Language=&amp;quot;C#&amp;quot; CodeBehind=&amp;quot;Example.ascx.cs&amp;quot; Inherits=&amp;quot;DV.Templates.Units.Example&amp;quot; %&amp;gt;
+
+&amp;lt;EPiServer:Property PropertyName=&amp;quot;PageName&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;
+&amp;lt;EPiServer:Property PropertyName=&amp;quot;MainBody&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;Please comment! Have you solved this problem in &lt;a href="http://world.episerver.com/Blogs/Dan-Matthews/Dates/2011/10/CurrentPage-in-Context/"&gt;another way&lt;/a&gt;?&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2012-02-28 14:07:44</pubDate>
+  <lastModified>2012-02-28 15:16:17</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>base-class-for-user-controls</slug>
+  <tags>
+    <tag>base class</tag>
+    <tag>user controls</tag>
+  </tags>
+  <comments>
+    <comment id="1a332efc-ecd4-4b94-8418-7a4c0c93b9a9" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-06-10 07:51:06</date>
+      <author>campus book rentals coupon</author>
+      <email>xtcvotshim@gmail.com</email>
+      <country />
+      <ip>207.158.26.16</ip>
+      <website>http://www.prweb.com/releases/2013/2/prweb10468724.htm</website>
+      <content>&lt;p&gt;hi awesome topic campus book rentals coupon http://www.prweb.com/releases/2013/2/prweb10468724.htm&lt;/p&gt;</content>
+    </comment>
+    <comment id="a908cee4-1fb0-48af-a6cd-15718d69aaeb" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-23 08:15:12</date>
+      <author>Betty</author>
+      <email>betty_younger@gawab.com</email>
+      <country />
+      <ip>108.178.2.98</ip>
+      <website>http://provestrasite.net/provestra-review/</website>
+      <content>&lt;p&gt;Howdy! I simply wish to give you a big thumbs up for your excellent information you've got here on this post. I'll be coming &lt;br /&gt;back to your web site for more soon.&lt;/p&gt;</content>
+    </comment>
+    <comment id="42dcc0e7-d6e8-41d1-82e8-cb57b4a20ed9" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-07-25 20:18:17</date>
+      <author>Yvonne</author>
+      <email>yvonne.garris@imap.cc</email>
+      <country />
+      <ip>173.236.32.219</ip>
+      <website>http://semenaxprice.com/</website>
+      <content>&lt;p&gt;Your way of describing the whole thing in this post is in fact good, every one be able to without difficulty understand it, Thanks &lt;br /&gt;a lot.&lt;/p&gt;</content>
+    </comment>
+    <comment id="0fc6dca1-e685-4e1b-87ce-049c45b69751" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-08-28 11:16:02</date>
+      <author>Website</author>
+      <email>daniholmes@inbox.com</email>
+      <country />
+      <ip>37.72.190.139</ip>
+      <website>http://phen375place.com/</website>
+      <content>&lt;p&gt;What's up, yup this piece of writing is genuinely pleasant and I have learned lot of things from &lt;br /&gt;it regarding blogging. thanks.&lt;/p&gt;</content>
+    </comment>
+    <comment id="7ec4f1ea-2c32-4de1-b533-249a033d4871" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-08-31 18:50:50</date>
+      <author>chegg inc shepherdsville ky</author>
+      <email>ingeborgsands@gmx.net</email>
+      <country />
+      <ip>142.91.154.9</ip>
+      <website>http://www.prisonpen-pal.com/index.php?do=/blog/2865/chegg-how-to-hire-textbooks-successfully/</website>
+      <content>&lt;p&gt;Anybody know if Chegg.com is coded as a bookstore for Citi Forward?&lt;br /&gt;This is the textbook rental site for school college students.&lt;/p&gt;</content>
+    </comment>
+    <comment id="dcfaf2cb-e623-432c-a8b3-4810a4b8b870" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-01 14:57:39</date>
+      <author>promo codes kindle</author>
+      <email>vickie_torrence@gmail.com</email>
+      <country />
+      <ip>142.91.154.77</ip>
+      <website>http://moasouthflorida.com/blog/28825/the-necessity-to-apply-vouchers-accurately/</website>
+      <content>&lt;p&gt;Kellogg's Cereals, $2.29 ea wyb four Limit four Use $1/2 Kellogg's &lt;br /&gt;Printable coupon or $1/2 Corn Flakes or $1/2 Frosted Mini &lt;br /&gt;Wheats Printable coupons (zip 77477 on this page) $1.79 ea&lt;/p&gt;</content>
+    </comment>
+    <comment id="8b0be619-823d-4b87-8b62-b1bbdf37fde4" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-02 20:11:09</date>
+      <author>vitamin shoppe creatine pills</author>
+      <email>danutakern@gmail.com</email>
+      <country />
+      <ip>142.91.154.174</ip>
+      <website>http://artmentors.tv/mediawiki/index.php/The_Medical_Status_of_Folks_Taking_Vitamin_Shoppe_Products:_A_Review</website>
+      <content>&lt;p&gt;I think we must charge CBS for not giving all the details.&lt;br /&gt;In addition they charged my bank card. I ordered a cost-free trial Mar 30th 2009 rec' april 4th &lt;br /&gt;billed april 14th been fighting because April 17th.&lt;/p&gt;</content>
+    </comment>
+    <comment id="fd91acd9-62b6-4548-a30b-f628a77be588" parentid="00000000-0000-0000-0000-000000000000" approved="True">
+      <date>2013-09-24 06:22:07</date>
+      <author>Roderick Larimer</author>
+      <email>dwjemoqgy@gmail.com</email>
+      <country />
+      <ip>183.234.60.43</ip>
+      <website>http://my.telegraph.co.uk/areyeastinfectionscontagious/</website>
+      <content>&lt;p&gt;I savor, cause I discovered just what I was taking a look for. You have ended my four day long hunt! God Bless you man. Have a great day. Bye&lt;/p&gt;</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>bf74dc56-651d-4a32-89bf-d757b885fc05</category>
+  </categories>
+  <notifications />
+</post>

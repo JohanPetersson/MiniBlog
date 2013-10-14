@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>Johan</author>
+  <title>How to fix the indentation-bug in the category administration</title>
+  <description />
+  <content>&lt;p&gt;The indentation got lost somewhere in the newer versions of EPiServer. In older versions and in EPiServer 6 there is a spacer-gif (hello 1999). To fix it (not in a nice way) in EPiServer 5.2.375.236 just replace all the markup in /UI/Admin/Categories.aspx with this:&lt;/p&gt;  &lt;p&gt;[more]&lt;/p&gt;  &lt;pre class="brush: html;"&gt;&amp;lt;%@ Page Language=&amp;quot;c#&amp;quot; CodeBehind=&amp;quot;Categories.aspx.cs&amp;quot; AutoEventWireup=&amp;quot;False&amp;quot; Inherits=&amp;quot;EPiServer.UI.Admin.Categories&amp;quot; MasterPageFile=&amp;quot;../MasterPages/EPiServerUI.Master&amp;quot; Title=&amp;quot;Edit Categories&amp;quot; %&amp;gt;
+
+&amp;lt;asp:Content ContentPlaceHolderID=&amp;quot;MainRegion&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+	&amp;lt;p&amp;gt;&amp;lt;episerverui:toolbutton id=&amp;quot;AddRootCategory&amp;quot; onclick=&amp;quot;InsertRootCategory&amp;quot; skinid=&amp;quot;Add&amp;quot; text=&amp;quot;&amp;lt;%$ Resources: EPiServer, button.add %&amp;gt;&amp;quot; tooltip=&amp;quot;&amp;lt;%$ Resources: EPiServer, button.add %&amp;gt;&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;&amp;lt;/p&amp;gt;
+	&amp;lt;asp:DataGrid ID=&amp;quot;Grid&amp;quot; runat=&amp;quot;server&amp;quot; AutoGenerateColumns=&amp;quot;false&amp;quot; OnPreRender=&amp;quot;PreRendering&amp;quot; OnDataBinding=&amp;quot;SetHeaders&amp;quot; OnEditCommand=&amp;quot;Edit_Clicked&amp;quot; OnCancelCommand=&amp;quot;CancelEditing&amp;quot; OnUpdateCommand=&amp;quot;Save_Click&amp;quot; OnDeleteCommand=&amp;quot;DeleteCategory&amp;quot; OnItemCommand=&amp;quot;HandleButtons&amp;quot;&amp;gt;
+		&amp;lt;Columns&amp;gt;
+			&amp;lt;asp:TemplateColumn&amp;gt;
+				&amp;lt;HeaderStyle CssClass=&amp;quot;epitableheading&amp;quot; /&amp;gt;
+				&amp;lt;ItemStyle CssClass=&amp;quot;nowrap&amp;quot; /&amp;gt;
+				&amp;lt;ItemTemplate&amp;gt;
+					&amp;lt;span style=&amp;quot;padding-left: &amp;lt;%#(((int)DataBinder.Eval(Container.DataItem, &amp;quot;Indent&amp;quot;))*15)%&amp;gt;px;&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;
+					&amp;lt;%# HttpUtility.HtmlEncode(DataBinder.Eval(Container.DataItem, &amp;quot;Name&amp;quot;).ToString()) %&amp;gt;
+				&amp;lt;/ItemTemplate&amp;gt;
+				&amp;lt;EditItemTemplate&amp;gt;
+					&amp;lt;span style=&amp;quot;padding-left: &amp;lt;%#(((int)DataBinder.Eval(Container.DataItem, &amp;quot;Indent&amp;quot;))*15)%&amp;gt;px;&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;
+					&amp;lt;asp:TextBox ID=&amp;quot;CategoryName&amp;quot; CssClass=&amp;quot;EP-requiredField&amp;quot; runat=&amp;quot;server&amp;quot; Text='&amp;lt;%#DataBinder.Eval(Container.DataItem, &amp;quot;Name&amp;quot;)%&amp;gt;'&amp;gt;&amp;lt;/asp:TextBox&amp;gt;&amp;amp;nbsp;
+					&amp;lt;asp:RequiredFieldValidator ID=&amp;quot;CategoryNameValidator&amp;quot; runat=&amp;quot;server&amp;quot; ControlToValidate=&amp;quot;CategoryName&amp;quot; Text=&amp;quot;*&amp;quot; /&amp;gt;
+					&amp;lt;asp:CustomValidator ID=&amp;quot;UniqueNameValidator&amp;quot; runat=&amp;quot;server&amp;quot; ControlToValidate=&amp;quot;CategoryName&amp;quot; OnServerValidate=&amp;quot;UniqueNameValidator_Validate&amp;quot; Text=&amp;quot;*&amp;quot; /&amp;gt;
+				&amp;lt;/EditItemTemplate&amp;gt;
+			&amp;lt;/asp:TemplateColumn&amp;gt;
+			&amp;lt;asp:TemplateColumn&amp;gt;
+				&amp;lt;HeaderStyle Width=&amp;quot;300&amp;quot; CssClass=&amp;quot;epitableheading&amp;quot; /&amp;gt;
+				&amp;lt;ItemStyle Width=&amp;quot;300&amp;quot; CssClass=&amp;quot;nowrap&amp;quot; /&amp;gt;
+				&amp;lt;ItemTemplate&amp;gt;
+					&amp;lt;span style=&amp;quot;padding-left: &amp;lt;%#(((int)DataBinder.Eval(Container.DataItem, &amp;quot;Indent&amp;quot;))*15)%&amp;gt;px;&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;
+					&amp;lt;%# HttpUtility.HtmlEncode(DataBinder.Eval(Container.DataItem, &amp;quot;Description&amp;quot;).ToString()) %&amp;gt;
+				&amp;lt;/ItemTemplate&amp;gt;
+				&amp;lt;EditItemTemplate&amp;gt;
+					&amp;lt;span style=&amp;quot;padding-left: &amp;lt;%#(((int)DataBinder.Eval(Container.DataItem, &amp;quot;Indent&amp;quot;))*15)%&amp;gt;px;&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;
+					&amp;lt;asp:TextBox Columns=&amp;quot;60&amp;quot; CssClass=&amp;quot;EP-requiredField&amp;quot; ID=&amp;quot;CategoryDescription&amp;quot; runat=&amp;quot;server&amp;quot; Text='&amp;lt;%#DataBinder.Eval(Container.DataItem, &amp;quot;Description&amp;quot;)%&amp;gt;'&amp;gt;&amp;lt;/asp:TextBox&amp;gt;&amp;amp;nbsp;
+					&amp;lt;asp:RequiredFieldValidator ID=&amp;quot;CategoryDescriptionValidator&amp;quot; runat=&amp;quot;server&amp;quot; ControlToValidate=&amp;quot;CategoryDescription&amp;quot; Text=&amp;quot;*&amp;quot; /&amp;gt;
+				&amp;lt;/EditItemTemplate&amp;gt;
+			&amp;lt;/asp:TemplateColumn&amp;gt;
+			&amp;lt;asp:TemplateColumn&amp;gt;
+				&amp;lt;HeaderStyle CssClass=&amp;quot;epitableheading&amp;quot; /&amp;gt;
+				&amp;lt;ItemTemplate&amp;gt;
+					&amp;lt;%#(bool)DataBinder.Eval(Container.DataItem, &amp;quot;Available&amp;quot;) ? &amp;quot;&amp;lt;img src='&amp;quot; + this.GetImageThemeUrl(&amp;quot;Tools/CheckBoxOn.gif&amp;quot;) + &amp;quot;' alt='&amp;quot; + EPiServer.Core.LanguageManager.Instance.Translate(&amp;quot;/admin/categories/tablevisible&amp;quot;) + &amp;quot;'&amp;gt;&amp;quot; : &amp;quot;&amp;lt;img src='&amp;quot; + this.GetImageThemeUrl(&amp;quot;Tools/CheckBoxOff.gif&amp;quot;) + &amp;quot;' alt='&amp;quot; + EPiServer.Core.LanguageManager.Instance.Translate(&amp;quot;/admin/categories/notvisible&amp;quot;) + &amp;quot;'&amp;gt;&amp;quot;%&amp;gt;
+				&amp;lt;/ItemTemplate&amp;gt;
+				&amp;lt;EditItemTemplate&amp;gt;
+					&amp;lt;asp:CheckBox runat=&amp;quot;server&amp;quot; Checked='&amp;lt;%#(bool)DataBinder.Eval(Container.DataItem, &amp;quot;Available&amp;quot;) ? true : false%&amp;gt;' /&amp;gt;
+				&amp;lt;/EditItemTemplate&amp;gt;
+			&amp;lt;/asp:TemplateColumn&amp;gt;
+			&amp;lt;asp:TemplateColumn&amp;gt;
+				&amp;lt;HeaderStyle CssClass=&amp;quot;epitableheading&amp;quot; /&amp;gt;
+				&amp;lt;ItemTemplate&amp;gt;
+					&amp;lt;%#(bool)DataBinder.Eval(Container.DataItem, &amp;quot;Selectable&amp;quot;) ? &amp;quot;&amp;lt;img src='&amp;quot; + this.GetImageThemeUrl(&amp;quot;Tools/CheckBoxOn.gif&amp;quot;) + &amp;quot;' alt='&amp;quot; + EPiServer.Core.LanguageManager.Instance.Translate(&amp;quot;/admin/categories/tableselectable&amp;quot;) + &amp;quot;'&amp;gt;&amp;quot; : &amp;quot;&amp;lt;img src='&amp;quot; + this.GetImageThemeUrl(&amp;quot;Tools/CheckBoxOff.gif&amp;quot;) + &amp;quot;' alt='&amp;quot; + EPiServer.Core.LanguageManager.Instance.Translate(&amp;quot;/admin/categories/notselectable&amp;quot;) + &amp;quot;'&amp;gt;&amp;quot;%&amp;gt;
+				&amp;lt;/ItemTemplate&amp;gt;
+				&amp;lt;EditItemTemplate&amp;gt;
+					&amp;lt;asp:CheckBox runat=&amp;quot;server&amp;quot; Checked='&amp;lt;%#(bool)DataBinder.Eval(Container.DataItem, &amp;quot;Selectable&amp;quot;) ? true : false%&amp;gt;' /&amp;gt;
+				&amp;lt;/EditItemTemplate&amp;gt;
+			&amp;lt;/asp:TemplateColumn&amp;gt;
+		&amp;lt;/Columns&amp;gt;
+	&amp;lt;/asp:DataGrid&amp;gt;
+	&amp;lt;br /&amp;gt;
+&amp;lt;/asp:Content&amp;gt;&lt;/pre&gt;</content>
+  <ispublished>True</ispublished>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2009-12-22 18:16:00</pubDate>
+  <lastModified>2009-12-22 18:23:19</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>how-to-fix-the-indentation-bug-in-the-category-administration</slug>
+  <tags>
+    <tag>ui</tag>
+    <tag>bugs</tag>
+    <tag>fixes</tag>
+  </tags>
+  <comments />
+  <categories>
+    <category>bf74dc56-651d-4a32-89bf-d757b885fc05</category>
+  </categories>
+  <notifications />
+</post>
