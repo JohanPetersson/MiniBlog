@@ -150,27 +150,9 @@
     <tag>pagedata</tag>
     <tag>migration</tag>
   </tags>
-  <comments>
-    <comment id="38f76442-da07-4c5f-9c2e-7105ccffd01c" parentid="00000000-0000-0000-0000-000000000000" approved="True">
-      <date>2009-12-17 00:31:16</date>
-      <author>Enes Bajramovic</author>
-      <email>mail.enes@gmail.com</email>
-      <country />
-      <ip>89.253.111.42</ip>
-      <content>&lt;p&gt;Just a couple of observations:&lt;br /&gt;1. If  I understand correctly items in unicodes and chars lists match 1 to 1, so why not using Dictionary&amp;lt;char,char&amp;gt;, it will speedup the execution.&lt;br /&gt;2. You would probably want to make that dictionary private static  to avoid unnecessary allocating if the method is called often.&lt;/p&gt;</content>
-    </comment>
-    <comment id="cb84f65c-a5ee-4bfc-909c-7875aca60658" parentid="38f76442-da07-4c5f-9c2e-7105ccffd01c" approved="True">
-      <date>2009-12-17 09:51:33</date>
-      <author>Johan</author>
-      <email>johan.pettersson@live.se</email>
-      <country />
-      <ip>192.168.8.192</ip>
-      <website>http://www.dodavinkeln.se/</website>
-      <content>&lt;p&gt;Great observation, but I didn´t consider speed when I wrote that code.&lt;br /&gt;Just wanted the job done and it did that well :)&lt;/p&gt;</content>
-    </comment>
-  </comments>
+	<comments />
   <categories>
-    <category>bf74dc56-651d-4a32-89bf-d757b885fc05</category>
+    <category>EPiServer</category>
   </categories>
   <notifications />
 </post>

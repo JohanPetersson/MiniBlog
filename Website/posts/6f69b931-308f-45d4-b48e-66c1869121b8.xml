@@ -524,18 +524,9 @@
     <tag>fixes</tag>
     <tag>custom property</tag>
   </tags>
-  <comments>
-    <comment id="37571aaa-34e2-4da3-88fa-c52a1c264d18" parentid="00000000-0000-0000-0000-000000000000" approved="True">
-      <date>2009-12-25 20:42:21</date>
-      <author>Anders Hattestad</author>
-      <email>anders.hattestad@objectware.no</email>
-      <country />
-      <ip>93.185.169.94</ip>
-      <content>&lt;p&gt;Great work, and cool that you have made the consept way better:)&lt;/p&gt;</content>
-    </comment>
-  </comments>
+  <comments />
   <categories>
-    <category>bf74dc56-651d-4a32-89bf-d757b885fc05</category>
+    <category>EPiServer</category>
   </categories>
   <notifications>
     <email>anders.hattestad@objectware.no</email>
