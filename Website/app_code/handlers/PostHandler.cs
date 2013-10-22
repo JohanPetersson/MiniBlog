@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Web.Hosting;
 
 public class PostHandler : IHttpHandler
 {
@@ -23,7 +21,7 @@ public class PostHandler : IHttpHandler
         }
         else if (mode == "save")
         {
-            EditPost(id, context.Request.Form["title"], context.Request.Form["content"], bool.Parse(context.Request.Form["isPublished"]));
+            EditPost(id, context.Request.Form["title"], context.Request.Form["content"], bool.Parse(context.Request.Form["isPublished"]), context.Request.Form["categories"].Split(','));
         }
     }
 
@@ -37,7 +35,7 @@ public class PostHandler : IHttpHandler
         Storage.Delete(post);
     }
 
-    private void EditPost(string id, string title, string content, bool isPublished)
+    private void EditPost(string id, string title, string content, bool isPublished, string[] categories)
     {
         Post post = Storage.GetAllPosts().FirstOrDefault(p => p.ID == id);
 
@@ -45,31 +43,35 @@ public class PostHandler : IHttpHandler
         {
             post.Title = title;
             post.Content = content;
+            post.Categories = categories;
         }
         else
         {
-            post = new Post() { Title = title, Content = content, Slug = CreateSlug(title) };
+            post = new Post() { Title = title, Content = content, Slug = CreateSlug(title), Categories = categories };
             HttpContext.Current.Response.Write(post.Url);
         }
 
-        SaveImagesToDisk(post);
+        SaveFilesToDisk(post);
 
         post.IsPublished = isPublished;
         Storage.Save(post);
     }
 
-    private void SaveImagesToDisk(Post post)
+    private void SaveFilesToDisk(Post post)
     {
-        foreach (Match match in Regex.Matches(post.Content, "src=\"(data:([^\"]+))\""))
+        foreach (Match match in Regex.Matches(post.Content, "(src|href)=\"(data:([^\"]+))\""))
         {
-            string extension = Regex.Match(match.Value, "data:image/([a-z]+);base64").Groups[1].Value;
+            string extension = Regex.Match(match.Value, "data:([^/]+)/([a-z]+);base64").Groups[2].Value;
 
-            byte[] bytes = ConvertToBytes(match.Groups[1].Value);
+            byte[] bytes = ConvertToBytes(match.Groups[2].Value);
             string path = Blog.SaveFileToDisk(bytes, extension);
 
-            string image = string.Format("src=\"{0}\" alt=\"\" /", path);
+            string value = string.Format("src=\"{0}\" alt=\"\" /", path);
 
-            post.Content = post.Content.Replace(match.Value, image);
+            if (match.Groups[1].Value == "href")
+                value = string.Format("href=\"{0}\"", path);
+
+            post.Content = post.Content.Replace(match.Value, value);
         }
     }
 

@@ -16,6 +16,8 @@
         btnCancel.removeAttr("disabled");
         chkPublish.removeAttr("disabled");
 
+        showCategoriesForEditing();
+
         toggleSourceView();
 
         $("#tools").fadeIn().css("display", "inline-block");
@@ -35,6 +37,8 @@
             btnSave.attr("disabled", true);
             btnCancel.attr("disabled", true);
             chkPublish.attr("disabled", true);
+
+            showCategoriesForDisplay();
 
             $("#tools").fadeOut();
         }
@@ -66,6 +70,7 @@
             isPublished: chkPublish[0].checked,
             title: txtTitle.text().trim(),
             content: txtContent.html(),
+            categories: getPostCategories(),
         })
           .success(function (data) {
               if (isNew) {
@@ -101,6 +106,45 @@
                 txtMessage.removeClass(className);
             });
         }, 4000);
+    },
+    getPostCategories = function () {
+        var categories = '';
+        if ($("#txtCategories").length > 0) {
+            categories = $("#txtCategories").val();
+        }
+        else {
+            $("ul.categories li a").each(function (index, item) {
+                if (categories.length > 0) {
+                    categories += ",";
+                }
+                categories += $(item).html();
+            });
+        }
+        return categories;
+    },
+    showCategoriesForEditing = function () {
+        var firstItemPassed = false;
+        var categoriesString = getPostCategories();
+        $("ul.categories li").each(function (index, item) {
+            if (!firstItemPassed) {
+                firstItemPassed = true;
+            }
+            else {
+                $(item).remove();
+            }
+        });
+        $("ul.categories").append("<li><input id='txtCategories' /></li>");
+        $("#txtCategories").val(categoriesString);
+    },
+    showCategoriesForDisplay = function () {
+        if ($("#txtCategories").length > 0) {
+            var categoriesArray = $("#txtCategories").val().split(',');
+            $("#txtCategories").parent().remove();
+
+            $.each(categoriesArray, function (index, category) {
+                $("ul.categories").append(' <li itemprop="articleSection" title="' + category + '"> <a href="/category/' + encodeURIComponent(category.toLowerCase()) + '">' + category + '</a> </li> ');
+            });
+        }
     };
 
     isNew = location.pathname.replace(/\//g, "") === "postnew";
@@ -139,7 +183,7 @@
     else if (txtTitle !== null && txtTitle.length === 1 && location.pathname.length > 1) {
         btnEdit.removeAttr("disabled");
         btnDelete.removeAttr("disabled");
-        $("#ispublished").fadeIn();
+        $("#ispublished").css({ "display": "inline" });
     }
 
 })(jQuery);
