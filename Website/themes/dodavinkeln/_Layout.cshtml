@@ -1,10 +1,10 @@
 ﻿<!doctype html>
 <html lang="en-us">
 <head prefix="og: http://ogp.me/ns#">
+    <meta charset="utf-8" />
 	<title>@Page.Title</title>
-	<meta charset="utf-8" />
-	<meta name="description" content="@Page.Title" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 
 	<link type="application/rsd+xml" rel="edituri" title="RSD" href="~/views/robots/rsd" />
 	<link type="application/rss+xml" rel="alternate" title="@Blog.Title" href="~/feed/rss/" />
@@ -22,31 +22,40 @@
 </head>
 <body itemscope itemtype="http://schema.org/Blog" class="@(User.Identity.IsAuthenticated ? "admin" : null)">
 	<div class="container">
-		<header class="page-header">
-			<span itemprop="name"><a href="~/" itemprop="url">@Blog.Title</a></span>
-		</header>
+        <header role="banner" class="page-header">
+            <span itemprop="name"><a href="~/" itemprop="url">@Blog.Title</a></span><br />
+            <em>By Johan Petersson</em>
+        </header>
 
 		<div role="main">
 			@RenderBody()
 
 			@if (Page.ShowPaging != null)
 			{
-				@RenderPage("Paging.cshtml")
+				<ul class="pager">
+					@if (Blog.GetPosts(Blog.PostsPerPage * 2).Count() > Blog.PostsPerPage)
+					{
+						<li class="next"><a href="@Blog.GetPagingUrl(1)" rel="next">Older <span class="glyphicon glyphicon-chevron-right"></span></a></li>
+					}
+					@if (Blog.CurrentPage > 1)
+					{
+						<li class="previous"><a href="@Blog.GetPagingUrl(-1)" rel="prev"><span class="glyphicon glyphicon-chevron-left"></span> Newer</a></li>
+					}
+				</ul>
 			}
 		</div>
 	</div>
 
-	<footer id="pagefooter" itemscope itemtype="http://schema.org/Person" itemprop="author">
+	<footer class="text-center" role="contentinfo" itemscope itemtype="http://schema.org/Person" itemprop="author">
 		@if (!User.Identity.IsAuthenticated)
 		{
-			<span class="login">
-				<a href="@FormsAuthentication.LoginUrl?ReturnUrl=@Request.RawUrl">Sign in <i class="icon-lock icon-white"></i></a>
+			<span class="pull-right">
+				<a href="@FormsAuthentication.LoginUrl?ReturnUrl=@Request.RawUrl">Sign in <i class="glyphicon glyphicon-lock"></i></a>
 			</span>
 		}
-		<span>Copyright &copy; @DateTime.Now.Year
-			<span itemprop="name">
-				<a href="http://madskristensen.net" itemprop="url">Mads Kristensen</a>
-			</span>
+		<span>
+			Copyright &copy; @DateTime.Now.Year
+			<a href="http://www.dodavinkeln.se" itemprop="url name">Johan Petersson</a>
 		</span>
 	</footer>
 
@@ -68,6 +77,10 @@
 	{
 		@RenderPage("~/views/AdminMenu.cshtml")
 	}
+	else
+	{
+	<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+	}
 </body>
 </html>
 
@@ -75,6 +88,6 @@
 {
 	if (User.Identity.IsAuthenticated)
 	{
-	<link href="@Blog.FingerPrint("/css/admin.css")" rel="stylesheet" />
+		<link href="@Blog.FingerPrint("/css/admin.css")" rel="stylesheet" />
 	}
 }

@@ -4,10 +4,10 @@
 			<a href="@Model.Url" itemprop="url">@Model.Title</a>
 		</h1>
 		<div>
-			<i class="icon-calendar"></i>
-			<abbr title="@Model.PubDate.ToLocalTime()" itemprop="datePublished">@Model.PubDate.ToLocalTime().ToLongDateString()</abbr>
-			<i class="icon-comment"></i> <a href="@Model.Url#comments" data-disqus-identifier="@Model.ID">Comments</a>
+			<span class="glyphicon glyphicon-bookmark"></span> Posted in:
 			@Categories()
+			<span class="glyphicon glyphicon-calendar"></span> <abbr title="@Model.PubDate.ToLocalTime()" itemprop="datePublished">@Model.PubDate.ToLocalTime().ToLongDateString()</abbr>
+			<span class="glyphicon glyphicon-comment"></span> <a href="@Model.Url#comments" data-disqus-identifier="@Model.ID">Comments</a>
 		</div>
 	</header>
 
@@ -33,12 +33,7 @@
 			</script>
 			<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 		</section>
-
-	if (Model.AreCommentsOpen(Context))
-	{
-		@RenderPage("~/views/CommentForm.cshtml")
 	}
- }
 </article>
 
 @helper Categories()
@@ -46,10 +41,9 @@
 	if (Model.Categories.Length > 0)
 	{
 	<ul class="categories">
-		<li><i class="icon-bookmark"></i>Posted in: </li>
 		@foreach (string cat in Model.Categories)
 		{
-			<li itemprop="articleSection" title="@cat">
+			<li itemprop="articleSection">
 				<a href="~/category/@HttpUtility.UrlEncode(cat.ToLowerInvariant())">@cat</a>
 			</li>
 		}

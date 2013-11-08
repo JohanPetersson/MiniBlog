@@ -1,259 +1,173 @@
-﻿body {
-    background-color: #fff;
+﻿@media only screen and (max-width: 1280px) {
+    @-ms-viewport {
+        width: 800px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    @-ms-viewport {
+        width: 600px;
+    }
+}
+
+html, body{
+    height: 100%;
 }
 
 img, video, iframe {
     max-width: 100%;
 }
 
-.page-header {
-    border: none;
-    text-align: center;
+.container {
+    min-height: 100%;
+    padding-bottom: 4em;
 }
 
-    .page-header a {
-        font-size: 3em;
+    .container > header a {
+        font-size: 1.5em;
+        font-weight: bold;
         color: #000;
     }
-
-.container {
-    margin-bottom: 2em;
-    max-width: 900px;
-    margin: 0 auto;
-    font: 1.3em/1.5 'Century Gothic', Verdana, Geneva, 'DejaVu Sans', sans-serif;
-    height: 100%;
-}
-
-    .container .pager {
-        margin-top: 2em;
-    }
-
-label, input[type], button, textarea {
-    font: inherit;
-}
 
 /*#region Post */
 
 .post header {
-    position: relative;
+    margin-bottom: 2.5em;
 }
 
-    .post header h1 {
-        margin-bottom: 0px;
+.post header a {
+    color: #000;
+}
+
+.post header div {
+    font-weight: bold;
+    color: #666;
+}
+    .post header div a {
+        color: #666;
     }
 
-        .post header h1 a {
-            font-size: .8em;
-            color: #000;
-        }
-
-    .post header div {
-        font-size: .75em;
-        margin-bottom: 1em;
-        opacity: .7;
+    .post header div .glyphicon {
+        font-size: 1.5em;
+        top: 6px;
     }
 
-        .post header div i:not(:first-child) {
-            margin-left: 10px;
-        }
+    .post header .glyphicon-bookmark {
+        color: #006592;
+    }
 
-        .post header div .categories {
-            margin-left: 10px;
+    .post header .glyphicon-calendar {
+        color: #777777;
+    }
+
+    .post header .glyphicon-comment {
+        color: #777777;
+    }
+
+    .post header div abbr {
+        padding-right: 10px;
+        border: none;
+    }
+
+    .post header div .categories {
+        margin: 0;
+        padding: 0 10px 0 0;
+        display: inline;
+    }
+
+        .post header div .categories li {
             display: inline;
         }
 
-            .post header div .categories li {
-                display: inline-block;
+            .post header div .categories li:not(:first-child):not(:last-child):after {
+                content: ", ";
             }
-
-                .post header div .categories li:not(:first-child):not(:last-child):after {
-                    content: ", ";
-                }
-
-.post abbr {
-    border: none;
-}
-
-.post h2 {
-    margin-bottom: 0;
-    font-size: 1.1em;
-}
 
 .post div[itemprop='articleBody'] {
     border-bottom: 1px solid #d3d3d3;
-    padding-bottom: .5em;
+    padding-bottom: 2em;
+    margin-bottom: 2em;
+    -ms-text-size-adjust: 150%;
 }
-
-.post p {
-    padding: .2em 0;
-}
-
-.post li {
-    line-height: 1.5;
-}
-
-/*#endregion */
-
-/*#region Comments */
-
-#comments article {
-    position: relative;
-}
-
-    #comments article div {
-        padding-left: 70px;
-    }
-
-        #comments article div p {
-            border: 1px solid #d3d3d3;
-            border-radius: 5px;
-            padding: 7px;
-            position: relative;
-            -ms-word-break: break-all;
-            word-break: break-all;
-        }
-
-            #comments article div p:before {
-                content: "";
-                position: absolute;
-                top: 10px;
-                left: -10px;
-                border-style: solid;
-                border-width: 9px 9px 9px 0;
-                border-color: transparent #d3d3d3;
-            }
-
-            #comments article div p:after {
-                content: "";
-                position: absolute;
-                top: 10px;
-                left: -9px;
-                border-style: solid;
-                border-width: 9px 9px 9px 0;
-                border-color: transparent #ffffff;
-            }
-
-    #comments article.self div p {
-        background: #f7f7f7;
-    }
-
-        #comments article.self div p:after {
-            border-color: transparent #f7f7f7;
-        }
-
-    #comments article [itemprop='commentText'] {
-        margin: 0;
-    }
-
-    #comments article img {
-        border-radius: 5px;
-        position: absolute;
-        top: 19px;
-    }
-
-    #comments article [itemprop='commentTime'] {
-        display: block;
-        text-align: right;
-        font-size: .7em;
-    }
-
-    #comments article [itemprop='creator'] {
-        font-size: .8em;
-        margin-left: 7px;
-    }
-
-/*#endregion */
-
-/*#region Comment form */
-
-#commentform {
-    margin-top: 2em;
-    width: 100%;
-}
-
-    #commentform ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    #commentform li {
-        margin: 10px 0;
-    }
-
-    #commentform label {
-        display: inline-block;
-        min-width: 80px;
-        position: relative;
-    }
-
-    #commentform input {
-        width: 280px;
-        line-height: 100%;
-        display: inline-block;
-    }
-
-    #commentform textarea {
-        width: 98%;
-        height: 100px;
-        font: inherit;
-    }
-
-    #commentform textarea, #commentform input {
-        border-radius: 4px;
-    }
-
-#status {
-    margin-left: 1em;
-}
-
-    #status.info {
-        color: green;
-    }
-
-    #status.error {
-        color: red;
-    }
 
 /*#endregion */
 
 /*#region Footer */
 
-#pagefooter {
+footer {
     background-color: #181818;
     color: #fff;
-    text-align: center;
-    font-size: .9em;
-    opacity: .9;
-    padding: 8px 0;
-    margin-top: 4em;
-    width: 100%;
-    position: absolute;
-    left: 0;
+    font-size: .85em;
+    padding: 10px;
+    clear: both;
+    position: relative;
+    margin: -35px 0 0 0;
+    height: 35px;
 }
 
-    #pagefooter .login {
-        float: right;
-        margin-right: 2em;
+    footer p {
+        padding: 1em 0;
+        text-align: center;
+    }
+
+    footer a {
+        color: #a9d2e1;
     }
 
 /*#endregion */
 
-/*#region Login page */
+/*#region Prettyprint */
 
-#login {
-    margin: 3em auto 10em auto;
-    width: 230px;
+/* Pretty printing styles. Used with prettify.js. */
+/* Vim sunburst theme by David Leibovic */
+
+pre .str, code .str { color: #d69d85; } /* string */
+pre .kwd, code .kwd { color: #569cd6; } /* keyword */
+pre .com, code .com { color: #AEAEAE; font-style: italic; } /* comment - gray */
+pre .typ, code .typ { color: #4ec9b0; } /* type */
+pre .lit, code .lit { color: #3387CC; } /* literal */
+pre .pun, code .pun { color: #dcdcdc; } /* punctuation */
+pre .pln, code .pln { color: #dcdcdc; } /* plaintext */
+pre .tag, code .tag { color: #569cd6; } /* html/xml tag */
+pre .atn, code .atn { color: #9cdcfe; } /* html/xml attribute name */
+pre .atv, code .atv { color: #dcdcdc; } /* html/xml attribute value */
+pre .dec, code .dec { color: #3387CC; } /* decimal - blue */
+
+pre.prettyprinted, code.prettyprinted {
+    color: #dcdcdc;
+    background-color: #1e1e1e;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -o-border-radius: 8px;
+    -ms-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
 }
 
-    #login input {
-        border-radius: 4px;
-        margin-bottom: 10px;
-    }
+pre.prettyprinted {
+    margin: 2em 0 !important;
+    padding: 1em !important;
+    white-space: pre-wrap !important;
+    border: 0 !important;
+}
 
-    #login button{
-        margin-top: 1em;
-        display: block;
-    }
+/* Specify class=linenums on a pre to get line numbering */
+ol.linenums { margin-top: 0; margin-bottom: 0; color: #AEAEAE; } /* IE indents via margin-left */
+li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8 { list-style-type: none }
+/* Alternate shading for lines */
+li.L1,li.L3,li.L5,li.L7,li.L9 { }
 
-/*#endregion */
+@media print {
+  pre .str, code .str { color: #060; }
+  pre .kwd, code .kwd { color: #006; font-weight: bold; }
+  pre .com, code .com { color: #600; font-style: italic; }
+  pre .typ, code .typ { color: #404; font-weight: bold; }
+  pre .lit, code .lit { color: #044; }
+  pre .pun, code .pun { color: #440; }
+  pre .pln, code .pln { color: #000; }
+  pre .tag, code .tag { color: #006; font-weight: bold; }
+  pre .atn, code .atn { color: #404; }
+  pre .atv, code .atv { color: #060; }
+}
+
+/*#endregion*/

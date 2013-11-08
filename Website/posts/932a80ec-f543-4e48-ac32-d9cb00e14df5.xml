@@ -1,14 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>Using EPiServer Find's Unified Search in EPiServer 6</title>
-  <description />
-  <content>&lt;p&gt;So you've read Joels &lt;a href="http://joelabrahamsson.com/entry/new-in-episerver-find-unified-search"&gt;blogpost about Unified Search&lt;/a&gt; and want to try it out, great! It's actually &amp;mdash; what I think &amp;mdash; one of the cooler features of Find when it comes to actual search and not just querying for data. Too bad it's just for EPiServer 7, luckily some of the parts are backported to EPiServer 6.&lt;/p&gt;
+  <slug>using-episerver-finds-unified-search-in-episerver-6</slug>
+  <author>Johan</author>
+  <pubDate>2013-02-25 18:30:00</pubDate>
+  <lastModified>2013-11-08 05:37:46</lastModified>
+  <content>
+		
+		
+		&lt;p&gt;So you've read Joels &lt;a href="http://joelabrahamsson.com/entry/new-in-episerver-find-unified-search"&gt;blogpost about Unified Search&lt;/a&gt; and want to try it out, great! It's actually — what I think — one of the cooler features of Find when it comes to actual search and not just querying for data. Too bad it's just for EPiServer 7, luckily some of the parts are backported to EPiServer 6.&lt;/p&gt;
 &lt;p&gt;[more]&lt;/p&gt;
 &lt;p&gt;So what's missing? We have to do most of the plumbing and hook up Find correctly, so everything is indexed, and we also have to add our own filters that resembles EPiServer's &lt;a href="http://sdk.episerver.com/library/cms6/html/T_EPiServer_Filters_FilterForVisitor.htm"&gt;FilterForVisitors&lt;/a&gt;. All of this could easily be done by EPiServer in a couple of days, but hey, we don't want to wait for that and it's not certain that this ever will be fully backported to EPiServer 6.&lt;/p&gt;
 &lt;p&gt;First you need to install Find, if you're going with nuget remember to specify the correct version so we don't get the EPiServer 7 Integration. You can find the instructions under My Services &amp;gt; Download .NET Api at &lt;a href="http://find.episerver.com"&gt;find.episerver.com&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;If you're using Page Type Builder you can implement the ISearchContent interface in a base class, some of the methods are implemented by default and some we want to override. In my example we're not actually implementing the interface but just overriding some of the properties by adding properties with the same name.&lt;/p&gt;
-&lt;pre class="brush: csharp;"&gt;namespace DV.PageTypes
+&lt;pre class="prettyprint lang-c"&gt;namespace DV.PageTypes
 {
     using System;
     using PageTypeBuilder;
@@ -253,25 +258,13 @@ SearchClient.Instance.Conventions.ForInstancesOf&amp;lt;UnifiedFile&amp;gt;()
 &lt;p&gt;As I mentioned before we added filters for each type. Those are added by default in the EPiServer 7 Integration, for EPiServer 6 they don't exists. So I've backported them by using Reflector and by verifying the outgoing requests' JSON. I've uploaded this code to EPiServer World because they are about about 200 lines of code, you can find them &lt;a href="http://world.episerver.com/Code/Johan-Pettersson/EPiServer-Find-Filters/"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;There are some caveats using Unified Search with EPiServer 6, for instance pages are not re-indexed when the access rights are changed for pages and files. To be safe, enable the scheduled indexing job, so the ACLs are updated at least every night.&lt;/p&gt;
 &lt;p&gt;If you have any questions or found any bugs, please let me know.&lt;/p&gt;
-&lt;p&gt;Hope this helps and happy searching!&lt;/p&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2013-02-25 18:30:00</pubDate>
-  <lastModified>2013-04-06 19:59:40</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>using-episerver-finds-unified-search-in-episerver-6</slug>
-  <tags>
-    <tag>search</tag>
-    <tag>episerver find</tag>
-    <tag>unified search</tag>
-  </tags>
-  <comments />
+&lt;p&gt;Hope this helps and happy searching!&lt;/p&gt;
+	
+	
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications>
-    <email>mail@joelabrahamsson.com</email>
-    <email>kishore.thupakula@gmail.com</email>
-  </notifications>
+  <comments></comments>
 </post>
