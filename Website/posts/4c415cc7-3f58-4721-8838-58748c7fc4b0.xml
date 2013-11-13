@@ -1,31 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>How to set a page updated programmatically</title>
-  <description />
-  <content>&lt;p&gt;If you want to mimic the &amp;ldquo;Mark page as changed&amp;rdquo;-checkbox in code it's not so obvious how to do that.&lt;/p&gt;
-&lt;p&gt;[more]&lt;/p&gt;
-&lt;pre class="brush: csharp;"&gt;PageData writeablePage = CurrentPage.CreateWritableClone();
+  <slug>how-to-set-a-page-updated-programmatically</slug>
+  <author>Johan</author>
+  <pubDate>2011-11-13 17:43:00</pubDate>
+  <lastModified>2013-11-13 05:34:44</lastModified>
+  <content>
+		&lt;p&gt;If you want to mimic the “Mark page as changed”-checkbox in code it's not so obvious how to do that.&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;PageData writeablePage = CurrentPage.CreateWritableClone();
 writeablePage["PageChangedOnPublish"] = true;
 
 DataFactory.Instance.Save(
     writeablePage,
     SaveAction.Publish,
     AccessLevel.NoAccess);&lt;/pre&gt;
-&lt;p&gt;The &lt;em&gt;CurrentPage.Changed property&lt;/em&gt; will now get updated when we publish the page.&lt;/p&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2011-11-13 17:43:00</pubDate>
-  <lastModified>2011-12-01 20:51:34</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>how-to-set-a-page-updated-programmatically</slug>
-  <tags>
-    <tag>pagedata</tag>
-  </tags>
-	<comments />
+&lt;p&gt;The &lt;em&gt;CurrentPage.Changed property&lt;/em&gt; will now get updated when we publish the page.&lt;/p&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications />
+  <comments></comments>
 </post>

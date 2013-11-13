@@ -1,9 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>Some useful extension methods</title>
-  <description />
-  <content>&lt;p&gt;Sometimes you don't want to use dynamic properties but still needs to find a certain page with a property or a page with a specific pagetype id.&lt;/p&gt;  &lt;p&gt;Here's my take on it.&lt;/p&gt;  &lt;p&gt;[more]&lt;/p&gt;  &lt;p&gt;These functions probably needs some error handling, but they still shows the concept.&lt;/p&gt;  &lt;pre class="brush: csharp;"&gt;/// &amp;lt;summary&amp;gt;
+  <slug>some-useful-extension-methods</slug>
+  <author>Johan</author>
+  <pubDate>2009-11-23 20:42:00</pubDate>
+  <lastModified>2013-11-13 05:42:04</lastModified>
+  <content>
+		&lt;p&gt;Sometimes you don't want to use dynamic properties but still needs to find a certain page with a property or a page with a specific pagetype id.&lt;/p&gt;  &lt;p&gt;Here's my take on it.&lt;/p&gt;    &lt;p&gt;These functions probably needs some error handling, but they still shows the concept.&lt;/p&gt;  &lt;pre class="prettyprint"&gt;/// &amp;lt;summary&amp;gt;
 /// Travers to the nearest parent with the specified PageTypeID
 /// &amp;lt;/summary&amp;gt;
 public static PageData TraverseTo(this PageData page, int pageTypeID)
@@ -67,7 +70,7 @@ public static bool Contains(this int[] ints, int value)
     return false;
 }&lt;/pre&gt;
 
-&lt;pre class="brush: csharp;"&gt;namespace DV
+&lt;pre class="prettyprint"&gt;namespace DV
 {
     using EPiServer;
     using EPiServer.Core;
@@ -166,21 +169,11 @@ public static bool Contains(this int[] ints, int value)
             return page;
         }
     }
-}&lt;/pre&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2009-11-23 20:42:00</pubDate>
-  <lastModified>2009-11-25 10:37:19</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>some-useful-extension-methods</slug>
-  <tags>
-    <tag>extension method</tag>
-    <tag>pagedata</tag>
-  </tags>
-  <comments />
+}&lt;/pre&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications />
+  <comments></comments>
 </post>

@@ -1,15 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>Using categories as tags in EPiServer</title>
-  <description />
-  <content>&lt;p&gt;First of all, big thanks to &lt;a href="http://labs.episerver.com/en/Blogs/Anders-Hattestad/"&gt;Anders Hattestad&lt;/a&gt; and all his great contributions to the community! Some months ago he posted a great &lt;a href="http://labs.episerver.com/en/Blogs/Anders-Hattestad/Dates/2009/3/Category---more-than-labeling/"&gt;post&lt;/a&gt; on how to use categories in a better way. I´ve taken his code and refined it a bit.&lt;/p&gt;  &lt;p&gt;[more]&lt;/p&gt;  &lt;p&gt;&lt;a href="http://www.dodavinkeln.se/image.axd?picture=categoryaddorselect.png"&gt;&lt;img class="right" alt="" src="http://www.dodavinkeln.se/image.axd?picture=categoryaddorselect_thumb.png" width="254" height="139" /&gt;&lt;/a&gt; I started with the gui first. The dropdown and the inputs needed some more styling to match EPiServer’s gui.&lt;/p&gt;  &lt;p&gt;Then I realized that all page categories were saved to the property, so if you where retrieving the property by&lt;/p&gt;  &lt;pre class="brush: csharp;"&gt;CurrentPage[&amp;quot;BlogPostTags&amp;quot;]&lt;/pre&gt;
+  <slug>using-categories-as-tags-in-episerver</slug>
+  <author>Johan</author>
+  <pubDate>2009-12-23 15:49:39</pubDate>
+  <lastModified>2013-11-13 05:37:53</lastModified>
+  <content>
+		&lt;p&gt;First of all, big thanks to &lt;a href="http://labs.episerver.com/en/Blogs/Anders-Hattestad/"&gt;Anders Hattestad&lt;/a&gt; and all his great contributions to the community! Some months ago he posted a great &lt;a href="http://labs.episerver.com/en/Blogs/Anders-Hattestad/Dates/2009/3/Category---more-than-labeling/"&gt;post&lt;/a&gt; on how to use categories in a better way. I´ve taken his code and refined it a bit.&lt;/p&gt;    &lt;p&gt;&amp;nbsp;I started with the gui first. The dropdown and the inputs needed some more styling to match EPiServer’s gui.&lt;/p&gt;  &lt;p&gt;Then I realized that all page categories were saved to the property, so if you where retrieving the property by&lt;/p&gt;  &lt;pre class="prettyprint"&gt;CurrentPage["BlogPostTags"]&lt;/pre&gt;
 
 &lt;p&gt;you would get all categories returned, not the ones just specified in the property. And you could not deselect any category on the page, just add new ones.&lt;/p&gt;
 
 &lt;p&gt;By default the property doesn´t hide the categories on the “Categories” tab. If you want to hide all categories just go to admin mode and change the visibility to false on the root category for the property.&lt;/p&gt;
 
-&lt;pre class="brush: csharp;"&gt;namespace DV.Properties
+&lt;pre class="prettyprint"&gt;namespace DV.Properties
 {
     using System;
     using System.Collections.Generic;
@@ -23,8 +26,8 @@
 
     [Serializable]
     [PageDefinitionTypePlugIn(
-        DisplayName = &amp;quot;Category selection - select or add&amp;quot;,
-        Description = &amp;quot;Category selection - select or add&amp;quot;)]
+        DisplayName = "Category selection - select or add",
+        Description = "Category selection - select or add")]
     public class PropertySelectOrAddCategory : PropertyCategory
     {
         public override EPiServer.Core.IPropertyControl CreatePropertyControl()
@@ -72,7 +75,7 @@
 
             if (customPropertyExists)
             {
-                e.Page.Property[&amp;quot;PageCategory&amp;quot;].Value = newValue;
+                e.Page.Property["PageCategory"].Value = newValue;
             }
         }
     }
@@ -88,29 +91,29 @@
             #region Display controls
 
             Panel outerDiv = new Panel();
-            outerDiv.Style.Add(&amp;quot;position&amp;quot;, &amp;quot;relative&amp;quot;);
-            outerDiv.Style.Add(&amp;quot;overflow&amp;quot;, &amp;quot;visible&amp;quot;);
+            outerDiv.Style.Add("position", "relative");
+            outerDiv.Style.Add("overflow", "visible");
             this.Controls.Add(outerDiv);
 
             addNewBox = new TextBox();
-            addNewBox.ID = this.Name + &amp;quot;NewText&amp;quot;;
-            addNewBox.CssClass = &amp;quot;episize240&amp;quot;;
-            addNewBox.Attributes.Add(&amp;quot;autocomplete&amp;quot;, &amp;quot;off&amp;quot;);
+            addNewBox.ID = this.Name + "NewText";
+            addNewBox.CssClass = "episize240";
+            addNewBox.Attributes.Add("autocomplete", "off");
             outerDiv.Controls.Add(addNewBox);
 
             Button addBtn = new Button();
-            addBtn.Text = &amp;quot;+&amp;quot;;
-            addBtn.CssClass = &amp;quot;epismallbutton&amp;quot;;
+            addBtn.Text = "+";
+            addBtn.CssClass = "epismallbutton";
             outerDiv.Controls.Add(addBtn);
 
             Panel theDiv = new Panel();
-            theDiv.ID = this.Name + &amp;quot;Options&amp;quot;;
-            theDiv.CssClass = &amp;quot;AutoCompleteWrapper&amp;quot;;
+            theDiv.ID = this.Name + "Options";
+            theDiv.CssClass = "AutoCompleteWrapper";
             outerDiv.Controls.Add(theDiv);
 
             oldItemsBox = new TextBox();
-            oldItemsBox.Style.Add(&amp;quot;display&amp;quot;, &amp;quot;none&amp;quot;);
-            oldItemsBox.ID = this.Name + &amp;quot;Old&amp;quot;;
+            oldItemsBox.Style.Add("display", "none");
+            oldItemsBox.ID = this.Name + "Old";
             this.Controls.Add(oldItemsBox);
 
             EPiServer.ClientScript.ScriptManager current = EPiServer.ClientScript.ScriptManager.Current;
@@ -147,7 +150,7 @@
             //second time
             if (this.Page.Request[oldItemsBox.UniqueID] != null)
             {
-                string[] split = this.Page.Request[oldItemsBox.UniqueID].Split(&amp;quot;;&amp;quot;.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                string[] split = this.Page.Request[oldItemsBox.UniqueID].Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string s in split)
                 {
@@ -184,36 +187,36 @@
 
             foreach (CategoryItem s in shown.Values)
             {
-                this.Controls.Add(new LiteralControl(&amp;quot;&amp;lt;div&amp;gt;&amp;quot;));
+                this.Controls.Add(new LiteralControl("&amp;lt;div&amp;gt;"));
                 CheckBox check = new CheckBox();
                 check.ID = s.Key;
                 check.Text = s.Name;
                 check.Checked = true;
                 this.Controls.Add(check);
-                this.Controls.Add(new LiteralControl(&amp;quot;&amp;lt;/div&amp;gt;&amp;quot;));
+                this.Controls.Add(new LiteralControl("&amp;lt;/div&amp;gt;"));
 
                 this.CheckBoxList.Add(check);
             }
 
             #region AutoComplete
 
-            ScriptManager.RegisterClientScriptBlock(this, typeof(PropertySelectOrAddCategory), &amp;quot;Startup&amp;quot; + this.Name, jsScript, false);
-            string dataArray = &amp;quot;&amp;quot;;
-            string scriptString = &amp;quot;&amp;lt;script language=\&amp;quot;JavaScript\&amp;quot;&amp;gt;&amp;quot;;
+            ScriptManager.RegisterClientScriptBlock(this, typeof(PropertySelectOrAddCategory), "Startup" + this.Name, jsScript, false);
+            string dataArray = "";
+            string scriptString = "&amp;lt;script language=\"JavaScript\"&amp;gt;";
 
             foreach (CategoryItem sub in existing.Values)
             {
-                if (dataArray != &amp;quot;&amp;quot;)
-                    dataArray += &amp;quot;,&amp;quot;;
-                dataArray += &amp;quot;\&amp;quot;&amp;quot; + sub.Name + &amp;quot;\&amp;quot;&amp;quot;;
+                if (dataArray != "")
+                    dataArray += ",";
+                dataArray += "\"" + sub.Name + "\"";
             }
-            scriptString += &amp;quot;\n new AutoComplete(&amp;quot; + System.Environment.NewLine +
-                &amp;quot; [&amp;quot; + dataArray + &amp;quot;],&amp;quot; + System.Environment.NewLine +
-                &amp;quot; document.getElementById('&amp;quot; + addNewBox.ClientID + &amp;quot;'),&amp;quot; + System.Environment.NewLine +
-                &amp;quot; document.getElementById('&amp;quot; + theDiv.ClientID + &amp;quot;'),&amp;quot; + System.Environment.NewLine +
-                &amp;quot; 25)&amp;quot;;
-            scriptString += &amp;quot;&amp;lt;/script&amp;gt;&amp;quot;;
-            ScriptManager.RegisterStartupScript(this, typeof(PropertySelectOrAddCategory), &amp;quot;Startup&amp;quot; + this.Name, scriptString, false);
+            scriptString += "\n new AutoComplete(" + System.Environment.NewLine +
+                " [" + dataArray + "]," + System.Environment.NewLine +
+                " document.getElementById('" + addNewBox.ClientID + "')," + System.Environment.NewLine +
+                " document.getElementById('" + theDiv.ClientID + "')," + System.Environment.NewLine +
+                " 25)";
+            scriptString += "&amp;lt;/script&amp;gt;";
+            ScriptManager.RegisterStartupScript(this, typeof(PropertySelectOrAddCategory), "Startup" + this.Name, scriptString, false);
 
             #endregion
         }
@@ -224,20 +227,20 @@
 
             if (oldItemsBox != null)
             {
-                string saveVal = &amp;quot;&amp;quot;;
+                string saveVal = "";
 
                 foreach (CheckBox check in CheckBoxList)
                 {
-                    if (saveVal != &amp;quot;&amp;quot;)
+                    if (saveVal != "")
                     {
-                        saveVal += &amp;quot;;&amp;quot;;
+                        saveVal += ";";
                     }
 
                     saveVal += check.Text;
                 }
 
                 oldItemsBox.Text = saveVal;
-                addNewBox.Text = &amp;quot;&amp;quot;;
+                addNewBox.Text = "";
             }
         }
 
@@ -296,7 +299,7 @@
             }
         }
 
-        string jsScript = @&amp;quot;
+        string jsScript = @"
         &amp;lt;style&amp;gt;
             .AutoCompleteWrapper {
                 position:absolute;
@@ -321,7 +324,7 @@
         &amp;lt;/style&amp;gt;
 
 
-        &amp;lt;script language=&amp;quot;&amp;quot;javascript&amp;quot;&amp;quot;&amp;gt;
+        &amp;lt;script language=""javascript""&amp;gt;
 
             function AutoCompleteDB() {
                 // set the initial values.
@@ -335,7 +338,7 @@
                 this.nCount++;
 
                 // if at the end of the string, flag this node as an end point.
-                if (str == &amp;quot;&amp;quot;&amp;quot;&amp;quot;)
+                if (str == """")
                     this.bEnd = true;
                 else {
                     // otherwise, pull the first letter off the string
@@ -350,7 +353,7 @@
 
             AutoCompleteDB.prototype.getCount = function(str, bExact) {
                 // if end of search string, return number
-                if (str == &amp;quot;&amp;quot;&amp;quot;&amp;quot;)
+                if (str == """")
                     if (this.bEnd &amp;amp;&amp;amp; bExact &amp;amp;&amp;amp; (this.nCount == 1)) return 0;
                 else return this.nCount;
 
@@ -372,7 +375,7 @@
             }
 
             AutoCompleteDB.prototype.getStrings = function(str1, str2, outStr) {
-                if (str1 == &amp;quot;&amp;quot;&amp;quot;&amp;quot;) {
+                if (str1 == """") {
                     // add matching strings to the array
                     if (this.bEnd)
                         outStr.push(str2);
@@ -424,7 +427,7 @@
             }
 
             AutoComplete.prototype.onblur = function() {
-                this.oDiv.style.visibility = &amp;quot;&amp;quot;hidden&amp;quot;&amp;quot;;
+                this.oDiv.style.visibility = ""hidden"";
             }
 
             AutoComplete.prototype.onTextChange = function() {
@@ -436,11 +439,11 @@
             }
 
             AutoComplete.prototype.onDivMouseOver = function() {
-                this.className = &amp;quot;&amp;quot;AutoCompleteHighlight&amp;quot;&amp;quot;;
+                this.className = ""AutoCompleteHighlight"";
             }
 
             AutoComplete.prototype.onDivMouseOut = function() {
-                this.className = &amp;quot;&amp;quot;AutoCompleteBackground&amp;quot;&amp;quot;;
+                this.className = ""AutoCompleteBackground"";
             }
 
             AutoComplete.prototype.onchange = function() {
@@ -457,7 +460,7 @@
 
                     // get all the matching strings from the AutoCompleteDB
                     var aStr = new Array();
-                    this.db.getStrings(txt, &amp;quot;&amp;quot;&amp;quot;&amp;quot;, aStr);
+                    this.db.getStrings(txt, """", aStr);
 
                     // add each string to the popup-div
                     var i, n = aStr.length;
@@ -470,15 +473,15 @@
                         oDiv.onmouseout = AutoComplete.prototype.onDivMouseOut;
                         oDiv.AutoComplete = this;
                     }
-                    this.oDiv.style.visibility = &amp;quot;&amp;quot;visible&amp;quot;&amp;quot;;
+                    this.oDiv.style.visibility = ""visible"";
                 }
                 else // hide the popup-div
                 {
-                    this.oDiv.innerHTML = &amp;quot;&amp;quot;&amp;quot;&amp;quot;;
-                    this.oDiv.style.visibility = &amp;quot;&amp;quot;hidden&amp;quot;&amp;quot;;
+                    this.oDiv.innerHTML = """";
+                    this.oDiv.style.visibility = ""hidden"";
                 }
             }
-        &amp;lt;/script&amp;gt;&amp;quot;;
+        &amp;lt;/script&amp;gt;";
 
         public class CategoryItem
         {
@@ -503,7 +506,7 @@
                 {
                     if (key == null)
                     {
-                        key = Name.ToLower().Trim().Replace(&amp;quot; &amp;quot;, &amp;quot;&amp;quot;).Replace(&amp;quot;.&amp;quot;, &amp;quot;&amp;quot;);
+                        key = Name.ToLower().Trim().Replace(" ", "").Replace(".", "");
                     }
 
                     return key;
@@ -511,24 +514,11 @@
             }
         }
     }
-}&lt;/pre&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2009-12-23 15:49:39</pubDate>
-  <lastModified>2010-02-04 17:19:59</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>using-categories-as-tags-in-episerver</slug>
-  <tags>
-    <tag>ui</tag>
-    <tag>fixes</tag>
-    <tag>custom property</tag>
-  </tags>
-  <comments />
+}&lt;/pre&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications>
-    <email>anders.hattestad@objectware.no</email>
-  </notifications>
+  <comments></comments>
 </post>

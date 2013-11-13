@@ -1,9 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>Using block elements as Dynamic Content</title>
-  <description />
-  <content>&lt;p&gt;When inserting dynamic content into the editor it gets surrounded with a p-element if you're inserting it into a new paragraph.&lt;/p&gt;  &lt;p&gt;Let's say our dynamic content &lt;em&gt;Teasers&lt;/em&gt; renders a div-element as a wrapper, the page won't validate beacause it's not valid to have a div in a p.&lt;/p&gt;  &lt;p&gt;We can easily fix this before the PageData gets persisted.&lt;/p&gt;  &lt;p&gt;[more]&lt;/p&gt;  &lt;p&gt;First we need to listen to some DataFactory events in global.asax.&lt;/p&gt;  &lt;pre class="brush: csharp;"&gt;protected void Application_Start(object sender, EventArgs e)
+  <slug>using-block-elements-as-dynamic-content</slug>
+  <author>Johan</author>
+  <pubDate>2009-12-10 17:05:00</pubDate>
+  <lastModified>2013-11-13 05:40:51</lastModified>
+  <content>
+		&lt;p&gt;When inserting dynamic content into the editor it gets surrounded with a p-element if you're inserting it into a new paragraph.&lt;/p&gt;  &lt;p&gt;Let's say our dynamic content &lt;em&gt;Teasers&lt;/em&gt; renders a div-element as a wrapper, the page won't validate beacause it's not valid to have a div in a p.&lt;/p&gt;  &lt;p&gt;We can easily fix this before the PageData gets persisted.&lt;/p&gt;    &lt;p&gt;First we need to listen to some DataFactory events in global.asax.&lt;/p&gt;  &lt;pre class="prettyprint"&gt;protected void Application_Start(object sender, EventArgs e)
 {
     EPiServer.DataFactory.Instance.CreatingPage 
         += new EPiServer.PageEventHandler(CreatingOrSavingPage);
@@ -15,7 +18,7 @@
 
 &lt;p&gt;With some regular expression magic we strip surrounding p-elements if we find any, in this case we´re looking for a dynamic content called &lt;em&gt;Teasers&lt;/em&gt;.&lt;/p&gt;
 
-&lt;pre class="brush: csharp;"&gt;private void CreatingOrSavingPage(object sender, EPiServer.PageEventArgs e)
+&lt;pre class="prettyprint"&gt;private void CreatingOrSavingPage(object sender, EPiServer.PageEventArgs e)
 {
     if (e.Page != null)
     {
@@ -25,26 +28,17 @@
             {
                 property.Value = Regex.Replace(
                     property.Value as string ?? string.Empty,
-                    &amp;quot;&amp;lt;p&amp;gt;\\s*(?&amp;lt;DynamicContent&amp;gt;&amp;lt;span[^&amp;gt;]*&amp;gt;{DynamicContent:Teasers}&amp;lt;/span&amp;gt;)\\s*&amp;lt;/p&amp;gt;&amp;quot;,
-                    &amp;quot;${DynamicContent}&amp;quot;,
+                    "&amp;lt;p&amp;gt;\\s*(?&amp;lt;DynamicContent&amp;gt;&amp;lt;span[^&amp;gt;]*&amp;gt;{DynamicContent:Teasers}&amp;lt;/span&amp;gt;)\\s*&amp;lt;/p&amp;gt;",
+                    "${DynamicContent}",
                     RegexOptions.Compiled | RegexOptions.IgnoreCase);
             }
         }
     }
-}&lt;/pre&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2009-12-10 17:05:00</pubDate>
-  <lastModified>2010-01-18 12:05:27</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>using-block-elements-as-dynamic-content</slug>
-  <tags>
-    <tag>dynamic content</tag>
-  </tags>
-  <comments />
+}&lt;/pre&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications />
+  <comments></comments>
 </post>

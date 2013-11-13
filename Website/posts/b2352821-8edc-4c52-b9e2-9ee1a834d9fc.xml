@@ -1,10 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>Always check if e.Page is null in DataFactory events</title>
-  <description />
-  <content>&lt;p&gt;If you&amp;rsquo;re listening to DataFactory events like:&lt;/p&gt;
-&lt;pre class="brush: csharp;"&gt;protected void Application_Start(object sender, EventArgs e)
+  <slug>always-check-if-epage-is-null-in-datafactory-events</slug>
+  <author>Johan</author>
+  <pubDate>2011-11-14 11:03:00</pubDate>
+  <lastModified>2013-11-13 05:33:23</lastModified>
+  <content>
+		&lt;p&gt;If you’re listening to DataFactory events like:&lt;/p&gt;
+&lt;pre class="prettyprint"&gt;protected void Application_Start(object sender, EventArgs e)
 {
     EPiServer.DataFactory.Instance.CreatingPage 
         += new EPiServer.PageEventHandler(CreatingOrSavingPage);
@@ -13,20 +16,11 @@
         += new EPiServer.PageEventHandler(CreatingOrSavingPage);
 }&lt;/pre&gt;
 &lt;p&gt;Always check if Page is null in PageEventsArgs. If we're copying a page in edit mode the Page will be null in one of the events!&lt;/p&gt;
-&lt;p&gt;I've updated the code for my &lt;a href="/post.aspx?id=f9314161-f511-400e-acd8-bf68385ecc0a"&gt;dynamic content fix&lt;/a&gt;, check on line 3 in &lt;em&gt;CreatingOrSavingPage&lt;/em&gt;.&lt;/p&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2011-11-14 11:03:00</pubDate>
-  <lastModified>2011-12-01 20:51:26</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>always-check-if-epage-is-null-in-datafactory-events</slug>
-  <tags>
-    <tag>datafactory</tag>
-  </tags>
-  <comments />
+&lt;p&gt;I've updated the code for my &lt;a href="/post.aspx?id=f9314161-f511-400e-acd8-bf68385ecc0a"&gt;dynamic content fix&lt;/a&gt;, check on line 3 in &lt;em&gt;CreatingOrSavingPage&lt;/em&gt;.&lt;/p&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications />
+  <comments></comments>
 </post>

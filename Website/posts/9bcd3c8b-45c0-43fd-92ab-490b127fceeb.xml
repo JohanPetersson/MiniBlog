@@ -1,19 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>johan</author>
   <title>Base class for user controls that handles CurrentPage in PageList</title>
-  <description />
-  <content>&lt;p&gt;If you add an EPiServer Property control to the PageLists ItemTemplate it handles &lt;strong&gt;CurrentPage&lt;/strong&gt; as expected, you can also get the &lt;strong&gt;CurrentPage&lt;/strong&gt; by the binding expression:&lt;/p&gt;  &lt;pre class="brush: csharp;"&gt;&amp;lt;%# Container.CurrentPage %&amp;gt;&lt;/pre&gt;
+  <slug>base-class-for-user-controls</slug>
+  <author>johan</author>
+  <pubDate>2012-02-28 14:07:44</pubDate>
+  <lastModified>2013-11-13 05:31:39</lastModified>
+  <content>
+		&lt;p&gt;If you add an EPiServer Property control to the PageLists ItemTemplate it handles &lt;strong&gt;CurrentPage&lt;/strong&gt; as expected, you can also get the &lt;strong&gt;CurrentPage&lt;/strong&gt; by the binding expression:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;&amp;lt;%# Container.CurrentPage %&amp;gt;&lt;/pre&gt;
 
 &lt;p&gt;Lets say you have an user control (.ascx) in the ItemTemplate instead, then the &lt;strong&gt;CurrentPage&lt;/strong&gt; will be the actual page the PageList control is added to. We can workaround this by having a property in our user control and set it to &lt;em&gt;Container.CurrentPage.PageLink&lt;/em&gt; and set each Property’s PageLink to it, but let’s make it a little bit more sophisticated. &lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;CurrentPage&lt;/strong&gt; is resolved by implementing &lt;em&gt;IPageSource&lt;/em&gt; or &lt;em&gt;ICurrentPage&lt;/em&gt;. But how do we implement them?&lt;/p&gt;
 
-&lt;p&gt;[more]&lt;/p&gt;
+
 
 &lt;p&gt;&lt;em&gt;IPageSource&lt;/em&gt; has one property and two methods which needs to be implemented.&lt;/p&gt;
 
-&lt;pre class="brush: csharp;"&gt;PageData CurrentPage { get; } 
+&lt;pre class="prettyprint"&gt;PageData CurrentPage { get; } 
 PageDataCollection GetChildren(PageReference pageLink); 
 PageData GetPage(PageReference pageLink);&lt;/pre&gt;
 
@@ -21,7 +24,7 @@ PageData GetPage(PageReference pageLink);&lt;/pre&gt;
 
 &lt;p&gt;In our case we need to find the nearest control that implements &lt;em&gt;IPageSource&lt;/em&gt; itself.&lt;/p&gt;
 
-&lt;pre class="brush: csharp;"&gt;public IPageSource PageSource
+&lt;pre class="prettyprint"&gt;public IPageSource PageSource
 {
     get
     {
@@ -52,7 +55,7 @@ PageData GetPage(PageReference pageLink);&lt;/pre&gt;
 
 &lt;p&gt;Now can we implement our &lt;strong&gt;CurrentPage&lt;/strong&gt;.&lt;/p&gt;
 
-&lt;pre class="brush: csharp;"&gt;public PageData CurrentPage
+&lt;pre class="prettyprint"&gt;public PageData CurrentPage
 {
     get
     {
@@ -62,7 +65,7 @@ PageData GetPage(PageReference pageLink);&lt;/pre&gt;
 
 &lt;p&gt;This is essentially what we need, but let’s implement all methods and properties. EPiServers default base class for user controls also have some other useful methods, so let’s add them too. This is the complete code:&lt;/p&gt;
 
-&lt;pre class="brush: csharp;"&gt;namespace DV
+&lt;pre class="prettyprint"&gt;namespace DV
 {
     using System.Web.UI;
     using EPiServer;
@@ -183,7 +186,7 @@ PageData GetPage(PageReference pageLink);&lt;/pre&gt;
 
                     if (this._page == null)
                     {
-                        throw new EPiServerException(&amp;quot;This user control must be placed on an ASPX-page that inherits from EPiServer.PageBase&amp;quot;);
+                        throw new EPiServerException("This user control must be placed on an ASPX-page that inherits from EPiServer.PageBase");
                     }
                 }
 
@@ -218,34 +221,24 @@ PageData GetPage(PageReference pageLink);&lt;/pre&gt;
 
 &lt;p&gt;Now can we add a user control to a PageList:&lt;/p&gt;
 
-&lt;pre class="brush: html;"&gt;&amp;lt;NetR:PageList AutoBind=&amp;quot;true&amp;quot; PageLink=&amp;quot;3&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+&lt;pre class="prettyprint"&gt;&amp;lt;NetR:PageList AutoBind="true" PageLink="3" runat="server"&amp;gt;
 	&amp;lt;ItemTemplate&amp;gt;
-		&amp;lt;units:Example runat=&amp;quot;server&amp;quot; /&amp;gt;
+		&amp;lt;units:Example runat="server" /&amp;gt;
 	&amp;lt;/ItemTemplate&amp;gt;
 &amp;lt;/NetR:PageList&amp;gt;&lt;/pre&gt;
 
 &lt;p&gt;And in our user control we can add Property controls as usual without needing to set each controls PageLink property:&lt;/p&gt;
 
-&lt;pre class="brush: html;"&gt;&amp;lt;%@ Control Language=&amp;quot;C#&amp;quot; CodeBehind=&amp;quot;Example.ascx.cs&amp;quot; Inherits=&amp;quot;DV.Templates.Units.Example&amp;quot; %&amp;gt;
+&lt;pre class="prettyprint"&gt;&amp;lt;%@ Control Language="C#" CodeBehind="Example.ascx.cs" Inherits="DV.Templates.Units.Example" %&amp;gt;
 
-&amp;lt;EPiServer:Property PropertyName=&amp;quot;PageName&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;
-&amp;lt;EPiServer:Property PropertyName=&amp;quot;MainBody&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;&lt;/pre&gt;
+&amp;lt;EPiServer:Property PropertyName="PageName" runat="server" /&amp;gt;
+&amp;lt;EPiServer:Property PropertyName="MainBody" runat="server" /&amp;gt;&lt;/pre&gt;
 
-&lt;p&gt;Please comment! Have you solved this problem in &lt;a href="http://world.episerver.com/Blogs/Dan-Matthews/Dates/2011/10/CurrentPage-in-Context/"&gt;another way&lt;/a&gt;?&lt;/p&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2012-02-28 14:07:44</pubDate>
-  <lastModified>2012-02-28 15:16:17</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>base-class-for-user-controls</slug>
-  <tags>
-    <tag>base class</tag>
-    <tag>user controls</tag>
-  </tags>
-  <comments />
+&lt;p&gt;Please comment! Have you solved this problem in &lt;a href="http://world.episerver.com/Blogs/Dan-Matthews/Dates/2011/10/CurrentPage-in-Context/"&gt;another way&lt;/a&gt;?&lt;/p&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications />
+  <comments></comments>
 </post>

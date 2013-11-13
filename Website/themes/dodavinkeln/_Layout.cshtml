@@ -6,15 +6,20 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 
-	<link type="application/rsd+xml" rel="edituri" title="RSD" href="~/views/robots/rsd" />
-	<link type="application/rss+xml" rel="alternate" title="@Blog.Title" href="~/feed/rss/" />
-	<link type="application/atom+xml" rel="alternate" title="@Blog.Title" href="~/feed/atom/" />
+	<link rel="edituri" type="application/rsd+xml" title="RSD" href="~/views/robots/rsd" />
+	<link rel="alternate" type="application/rss+xml" title="@Blog.Title" href="~/feed/rss/" />
+	<link rel="alternate" type="application/atom+xml" title="@Blog.Title" href="~/feed/atom/" />
 
+	<link rel="shortcut icon" href="@Blog.FingerPrint("/themes/" + Blog.Theme + "/favicon.ico")" type="image/x-icon" />
 	<link rel="stylesheet" href="@Blog.FingerPrint("/css/bootstrap-3.0.0.css", "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css")" />
 	<link rel="stylesheet" href="@Blog.FingerPrint("/themes/" + Blog.Theme + "/site.css")" />
-	<link rel="shortcut icon" href="@Blog.FingerPrint("/themes/" + Blog.Theme + "/favicon.ico")" type="image/x-icon" />
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nixie+One" />
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lora" />
 
-	@AdminCss()
+	@if (User.Identity.IsAuthenticated)
+	{
+		<link href="@Blog.FingerPrint("/css/admin.css")" rel="stylesheet" />
+	}
 
 	<meta property="og:title" content="@Page.Title" />
 	<meta property="og:type" content="website" />
@@ -22,27 +27,39 @@
 </head>
 <body itemscope itemtype="http://schema.org/Blog" class="@(User.Identity.IsAuthenticated ? "admin" : null)">
 	<div class="container">
-        <header role="banner" class="page-header">
-            <span itemprop="name"><a href="~/" itemprop="url">@Blog.Title</a></span><br />
-            <em>By Johan Petersson</em>
-        </header>
+        <div class="row">
+			<header role="banner" class="about col-md-3">
+				<img src="/themes/@Blog.Theme/johan.jpg" class="img-circle" width="140" alt="" />
+				<span itemprop="name" class="sr-only">
+					<a href="~/" itemprop="url">@Blog.Title</a>
+				</span>
+				<em class="sr-only">By Johan Petersson</em>
+				<p>
+					My name is Johan Petersson and I´m working as a developer at <a href="http://www.netrelations.com/en-us/">NetRelations</a> in Los Angeles.<br />
+					I´m very interested in developing user interfaces and server-side stuff.<br />
+					In my spare time I like to ski downhill, drive my green rocket and dive into the ocean.
+				</p>
+				<p><a href="https://twitter.com/dodavinkeln">twitter.com/dodavinkeln</a></p>
+				<p><a href="http://www.linkedin.com/in/peterssonjohan">linkedin.com/in/peterssonjohan</a></p>
+			</header>
 
-		<div role="main">
-			@RenderBody()
+			<div role="main" class="col-md-9">
+				@RenderBody()
 
-			@if (Page.ShowPaging != null)
-			{
-				<ul class="pager">
-					@if (Blog.GetPosts(Blog.PostsPerPage * 2).Count() > Blog.PostsPerPage)
-					{
-						<li class="next"><a href="@Blog.GetPagingUrl(1)" rel="next">Older <span class="glyphicon glyphicon-chevron-right"></span></a></li>
-					}
-					@if (Blog.CurrentPage > 1)
-					{
-						<li class="previous"><a href="@Blog.GetPagingUrl(-1)" rel="prev"><span class="glyphicon glyphicon-chevron-left"></span> Newer</a></li>
-					}
-				</ul>
-			}
+				@if (Page.ShowPaging != null)
+				{
+					<ul class="pager">
+						@if (Blog.GetPosts(Blog.PostsPerPage * 2).Count() > Blog.PostsPerPage)
+						{
+							<li class="next"><a href="@Blog.GetPagingUrl(1)" rel="next">Older <span class="glyphicon glyphicon-chevron-right"></span></a></li>
+						}
+						@if (Blog.CurrentPage > 1)
+						{
+							<li class="previous"><a href="@Blog.GetPagingUrl(-1)" rel="prev"><span class="glyphicon glyphicon-chevron-left"></span> Newer</a></li>
+						}
+					</ul>
+				}
+			</div>
 		</div>
 	</div>
 
@@ -50,12 +67,11 @@
 		@if (!User.Identity.IsAuthenticated)
 		{
 			<span class="pull-right">
-				<a href="@FormsAuthentication.LoginUrl?ReturnUrl=@Request.RawUrl">Sign in <i class="glyphicon glyphicon-lock"></i></a>
+				<a href="@FormsAuthentication.LoginUrl?ReturnUrl=@Request.RawUrl">Sign in <span class="glyphicon glyphicon-lock"></span></a>
 			</span>
 		}
 		<span>
-			Copyright &copy; @DateTime.Now.Year
-			<a href="http://www.dodavinkeln.se" itemprop="url name">Johan Petersson</a>
+			Copyright &copy; @DateTime.Now.Year <a href="http://www.dodavinkeln.se" itemprop="url name">Johan Petersson</a>
 		</span>
 	</footer>
 
@@ -79,15 +95,8 @@
 	}
 	else
 	{
-	<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+		<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+		<script> (function (i, s, o, g, r, a, m) { i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () { (i[r].q = i[r].q || []).push(arguments) }, i[r].l = 1 * new Date(); a = s.createElement(o), m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m) })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga'); ga('create', 'UA-11739011-1'); ga('send', 'pageview'); </script>
 	}
 </body>
 </html>
-
-@helper AdminCss()
-{
-	if (User.Identity.IsAuthenticated)
-	{
-		<link href="@Blog.FingerPrint("/css/admin.css")" rel="stylesheet" />
-	}
-}

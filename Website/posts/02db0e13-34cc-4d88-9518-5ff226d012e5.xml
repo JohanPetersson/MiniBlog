@@ -1,11 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>Seo tip: canonical domain</title>
-  <description />
-  <content>&lt;p&gt;One really big enhancement is canonical urls for your/customers content. I&amp;rsquo;m sure you all know about the problem with duplicated content, but not everyone tend to fix it. Here&amp;rsquo;s my take on it.&lt;/p&gt;
-&lt;p&gt;[more]&amp;nbsp;&lt;/p&gt;
-&lt;pre class="brush: csharp;"&gt;namespace DV.HttpModules
+  <slug>seo-tip-canonical-domain</slug>
+  <author>Johan</author>
+  <pubDate>2011-10-30 13:46:00</pubDate>
+  <lastModified>2013-11-13 05:36:56</lastModified>
+  <content>
+		&lt;p&gt;One really big enhancement is canonical urls for your/customers content. I’m sure you all know about the problem with duplicated content, but not everyone tend to fix it. Here’s my take on it.&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;namespace DV.HttpModules
 {
     using System;
     using System.Web;
@@ -69,20 +72,11 @@
         }
     }
 }&lt;/pre&gt;
-&lt;p&gt;Modules are executed in the order they are configured. So if we register it before EPiServer&amp;rsquo;s UrlRewriteModule the url will not be rewritten when the module is executed, not a big deal in this case, but just remember it.&lt;/p&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2011-10-30 13:46:00</pubDate>
-  <lastModified>2011-12-01 20:50:56</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>seo-tip-canonical-domain</slug>
-  <tags>
-    <tag>seo</tag>
-  </tags>
-	<comments />
+&lt;p&gt;Modules are executed in the order they are configured. So if we register it before EPiServer’s UrlRewriteModule the url will not be rewritten when the module is executed, not a big deal in this case, but just remember it.&lt;/p&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications />
+  <comments></comments>
 </post>

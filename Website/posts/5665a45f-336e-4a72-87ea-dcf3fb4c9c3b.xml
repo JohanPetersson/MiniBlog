@@ -1,10 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>johan</author>
   <title>Url rewriter for a blog</title>
-  <description />
-  <content>&lt;p&gt;Rewrites tags, dates and pages. Supports the format /Templates/Blog.aspx?id=3&amp;amp;epslanguage=en&amp;amp;year=2012&amp;amp;month=5&amp;amp;page=2&amp;amp;tag=episerver&lt;/p&gt;  &lt;p&gt;[more]&lt;/p&gt;  &lt;pre class="brush: csharp;"&gt;
-namespace DV.UrlRewriters
+  <slug>url-rewriter-for-a-blog</slug>
+  <author>johan</author>
+  <pubDate>2012-03-15 16:37:11</pubDate>
+  <lastModified>2013-11-13 05:30:15</lastModified>
+  <content>
+		&lt;p&gt;Rewrites tags, dates and pages. Supports the format /Templates/Blog.aspx?id=3&amp;amp;epslanguage=en&amp;amp;year=2012&amp;amp;month=5&amp;amp;page=2&amp;amp;tag=episerver&lt;/p&gt;    &lt;pre class="prettyprint"&gt;namespace DV.UrlRewriters
 {
     using System;
     using System.Collections.Specialized;
@@ -25,7 +27,7 @@ namespace DV.UrlRewriters
         /// &amp;lt;/summary&amp;gt;
         private static bool RewriteToInternal(UrlBuilder url)
         {
-            return Regex.Match(url.Path, &amp;quot;/tag/|/((?:19|20)\\d\\d)/(0[1-9]|1[012])/|/((?:19|20)\\d\\d)/|/page/\\d*/&amp;quot;, RegexOptions.Compiled | RegexOptions.IgnoreCase).Success;
+            return Regex.Match(url.Path, "/tag/|/((?:19|20)\\d\\d)/(0[1-9]|1[012])/|/((?:19|20)\\d\\d)/|/page/\\d*/", RegexOptions.Compiled | RegexOptions.IgnoreCase).Success;
         }
 
         /// &amp;lt;summary&amp;gt;
@@ -33,10 +35,10 @@ namespace DV.UrlRewriters
         /// &amp;lt;/summary&amp;gt;
         private static bool RewriteToExternal(UrlBuilder url)
         {
-            return url.QueryCollection[&amp;quot;tag&amp;quot;] != null
-                || url.QueryCollection[&amp;quot;year&amp;quot;] != null
-                || url.QueryCollection[&amp;quot;month&amp;quot;] != null
-                || url.QueryCollection[&amp;quot;page&amp;quot;] != null;
+            return url.QueryCollection["tag"] != null
+                || url.QueryCollection["year"] != null
+                || url.QueryCollection["month"] != null
+                || url.QueryCollection["page"] != null;
         }
 
         public override bool TryConvertToInternal(UrlBuilder url, out CultureInfo preferredCulture, out object internalObject)
@@ -58,13 +60,13 @@ namespace DV.UrlRewriters
                     return isModified;
                 }
 
-                if (!url.Path.EndsWith(&amp;quot;/&amp;quot;))
+                if (!url.Path.EndsWith("/"))
                 {
-                    HttpContext.Current.Response.Redirect(url.Path + &amp;quot;/&amp;quot; + url.Query + url.Fragment);
+                    HttpContext.Current.Response.Redirect(url.Path + "/" + url.Query + url.Fragment);
                 }
 
                 // Get the address to the blog (remove all rewritten query parameters)
-                string path = Regex.Replace(url.Path, &amp;quot;tag/[^/]*/|(?:19|20)\\d\\d/0[1-9]|1[012]/|(?:19|20)\\d\\d/|page/\\d*/&amp;quot;, string.Empty, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                string path = Regex.Replace(url.Path, "tag/[^/]*/|(?:19|20)\\d\\d/0[1-9]|1[012]/|(?:19|20)\\d\\d/|page/\\d*/", string.Empty, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                 string pathWithOutLanguage = string.Empty;
 
                 LanguageBranch languageBranch = GetLanguageBranchAndPath(path, out pathWithOutLanguage);
@@ -85,14 +87,14 @@ namespace DV.UrlRewriters
                 PageData blogPage = null;
                 PageReference blogPageReference = null;
 
-                if (PageReference.TryParse(queryCollection[&amp;quot;id&amp;quot;], out blogPageReference))
+                if (PageReference.TryParse(queryCollection["id"], out blogPageReference))
                 {
                     if ((blogPageReference.WorkID &amp;gt; 0) || !string.IsNullOrEmpty(blogPageReference.RemoteSite))
                     {
                         blogPage = DataFactory.Instance.GetPage(blogPageReference);
                     }
 
-                    queryCollection.Remove(&amp;quot;id&amp;quot;);
+                    queryCollection.Remove("id");
                 }
 
                 if (blogPage == null)
@@ -101,34 +103,34 @@ namespace DV.UrlRewriters
                 }
 
                 // Add query parameters
-                queryCollection.Add(&amp;quot;id&amp;quot;, blogPage.PageLink.ToString());
-                queryCollection.Add(&amp;quot;epslanguage&amp;quot;, ContentLanguage.PreferredCulture.Name);
+                queryCollection.Add("id", blogPage.PageLink.ToString());
+                queryCollection.Add("epslanguage", ContentLanguage.PreferredCulture.Name);
 
-                Match tag = Regex.Match(url.Path, &amp;quot;/tag/([^/]*)/&amp;quot;, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                Match dates = Regex.Match(url.Path, &amp;quot;/((?:19|20)\\d\\d)/(0[1-9]|1[012])/|/((?:19|20)\\d\\d)/&amp;quot;, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                Match page = Regex.Match(url.Path, &amp;quot;/page/(\\d*)/&amp;quot;, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                Match tag = Regex.Match(url.Path, "/tag/([^/]*)/", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                Match dates = Regex.Match(url.Path, "/((?:19|20)\\d\\d)/(0[1-9]|1[012])/|/((?:19|20)\\d\\d)/", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                Match page = Regex.Match(url.Path, "/page/(\\d*)/", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                 if (tag.Success)
                 {
-                    queryCollection.Add(&amp;quot;tag&amp;quot;, tag.Groups[1].Value);
+                    queryCollection.Add("tag", tag.Groups[1].Value);
                 }
 
                 if (dates.Success)
                 {
                     if (!string.IsNullOrEmpty(dates.Groups[1].Value) &amp;amp;&amp;amp; !string.IsNullOrEmpty(dates.Groups[2].Value))
                     {
-                        queryCollection.Add(&amp;quot;year&amp;quot;, dates.Groups[1].Value);
-                        queryCollection.Add(&amp;quot;month&amp;quot;, dates.Groups[2].Value);
+                        queryCollection.Add("year", dates.Groups[1].Value);
+                        queryCollection.Add("month", dates.Groups[2].Value);
                     }
                     else if (!string.IsNullOrEmpty(dates.Groups[3].Value))
                     {
-                        queryCollection.Add(&amp;quot;year&amp;quot;, dates.Groups[3].Value);
+                        queryCollection.Add("year", dates.Groups[3].Value);
                     }
                 }
 
                 if (page.Success)
                 {
-                    queryCollection.Add(&amp;quot;page&amp;quot;, page.Groups[1].Value);
+                    queryCollection.Add("page", page.Groups[1].Value);
                 }
 
 
@@ -157,25 +159,25 @@ namespace DV.UrlRewriters
 
                     string friendlyUrl = urlToBlog.Path;
 
-                    if (url.QueryCollection[&amp;quot;tag&amp;quot;] != null)
+                    if (url.QueryCollection["tag"] != null)
                     {
-                        friendlyUrl = string.Concat(friendlyUrl, &amp;quot;tag/&amp;quot;, url.QueryCollection[&amp;quot;tag&amp;quot;].ToLower(), &amp;quot;/&amp;quot;);
+                        friendlyUrl = string.Concat(friendlyUrl, "tag/", url.QueryCollection["tag"].ToLower(), "/");
                     }
 
-                    if (url.QueryCollection[&amp;quot;year&amp;quot;] != null)
+                    if (url.QueryCollection["year"] != null)
                     {
-                        friendlyUrl = string.Concat(friendlyUrl, url.QueryCollection[&amp;quot;year&amp;quot;], &amp;quot;/&amp;quot;);
+                        friendlyUrl = string.Concat(friendlyUrl, url.QueryCollection["year"], "/");
                     }
 
-                    if (url.QueryCollection[&amp;quot;month&amp;quot;] != null)
+                    if (url.QueryCollection["month"] != null)
                     {
-                        friendlyUrl = string.Concat(friendlyUrl, url.QueryCollection[&amp;quot;month&amp;quot;], &amp;quot;/&amp;quot;);
+                        friendlyUrl = string.Concat(friendlyUrl, url.QueryCollection["month"], "/");
                     }
 
                     // Allways check for paging
-                    if (url.QueryCollection[&amp;quot;page&amp;quot;] != null)
+                    if (url.QueryCollection["page"] != null)
                     {
-                        friendlyUrl = string.Concat(friendlyUrl, &amp;quot;page/&amp;quot;, url.QueryCollection[&amp;quot;page&amp;quot;], &amp;quot;/&amp;quot;);
+                        friendlyUrl = string.Concat(friendlyUrl, "page/", url.QueryCollection["page"], "/");
                     }
 
                     url.Path = friendlyUrl;
@@ -195,24 +197,11 @@ namespace DV.UrlRewriters
         }
     }
 }
-&lt;/pre&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2012-03-15 16:37:11</pubDate>
-  <lastModified>2012-03-15 16:39:28</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>Url-rewriter-for-a-blog</slug>
-  <tags>
-    <tag>urlrewriter</tag>
-    <tag>blog</tag>
-    <tag>friendly url</tag>
-  </tags>
-	<comments />
+&lt;/pre&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications>
-    <email>justinledalo@gmail.com</email>
-  </notifications>
+  <comments></comments>
 </post>

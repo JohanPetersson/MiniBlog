@@ -1,36 +1,30 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>Edit page link</title>
-  <description />
-  <content>&lt;p&gt;If you’re like me and don’t like the on-page-edit-right-click-menu but still want provide a simple shortcut for editors to edit the current page.&lt;/p&gt;   &lt;h2&gt;Our markup...&lt;/h2&gt; &lt;pre class="brush: xhtml;"&gt;&amp;lt;a href=&amp;quot;&amp;lt;%= CurrentPage.EditURL() %&amp;gt;&amp;quot;&amp;gt;Edit this page&amp;lt;/a&amp;gt;&lt;/pre&gt;
+  <slug>edit-page-link</slug>
+  <author>Johan</author>
+  <pubDate>2009-11-24 20:13:48</pubDate>
+  <lastModified>2013-11-13 05:41:27</lastModified>
+  <content>
+		&lt;p&gt;If you’re like me and don’t like the on-page-edit-right-click-menu but still want provide a simple shortcut for editors to edit the current page.&lt;/p&gt;   &lt;h2&gt;Our markup...&lt;/h2&gt; &lt;pre class="prettyprint"&gt;&amp;lt;a href="&amp;lt;%= CurrentPage.EditURL() %&amp;gt;"&amp;gt;Edit this page&amp;lt;/a&amp;gt;&lt;/pre&gt;
 
 &lt;h2&gt;... and our extension method&lt;/h2&gt;
-&lt;pre class="brush: csharp;"&gt;public static string EditURL(this PageData page)
+&lt;pre class="prettyprint"&gt;public static string EditURL(this PageData page)
 {
-    string baselink = UriSupport.AbsoluteUrlFromUIBySettings(&amp;quot;edit/&amp;quot;);
+    string baselink = UriSupport.AbsoluteUrlFromUIBySettings("edit/");
 
     return string.Format(
-        &amp;quot;{0}SwitchLanguage.aspx?language={1}&amp;amp;epUrl={2}&amp;quot;,
+        "{0}SwitchLanguage.aspx?language={1}&amp;amp;epUrl={2}",
         baselink,
         page.LanguageBranch,
-        HttpUtility.UrlEncode(string.Concat(baselink, &amp;quot;default.aspx?id=&amp;quot;, page.PageLink.ToString())));
+        HttpUtility.UrlEncode(string.Concat(baselink, "default.aspx?id=", page.PageLink.ToString())));
 }&lt;/pre&gt;
 
-&lt;p&gt;Of course you have check access rights before rendering the link.&lt;/p&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2009-11-24 20:13:48</pubDate>
-  <lastModified>2009-11-24 20:29:28</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>edit-page-link</slug>
-  <tags>
-    <tag>extension method</tag>
-  </tags>
-  <comments />
+&lt;p&gt;Of course you have check access rights before rendering the link.&lt;/p&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications />
+  <comments></comments>
 </post>

@@ -1,124 +1,127 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>Convert symbol to unicode</title>
-  <description />
-  <content>&lt;p&gt;Lately I´ve been working a lot with migrating technical documents to EPiServer. These documents often contained &lt;/p&gt;  &lt;pre class="brush: xml;"&gt;&amp;lt;font face=&amp;quot;symbol&amp;quot;&amp;gt;W&amp;lt;/font&amp;gt;&lt;/pre&gt;
+  <slug>convert-symbol-to-unicode</slug>
+  <author>Johan</author>
+  <pubDate>2009-12-16 17:28:32</pubDate>
+  <lastModified>2013-11-13 05:39:47</lastModified>
+  <content>
+		&lt;p&gt;Lately I´ve been working a lot with migrating technical documents to EPiServer. These documents often contained &lt;/p&gt;  &lt;pre class="prettyprint"&gt;&amp;lt;font face="symbol"&amp;gt;W&amp;lt;/font&amp;gt;&lt;/pre&gt;
 
 &lt;p&gt;instead of Ω.&lt;/p&gt;
 
 &lt;p&gt;So I made a function that converts symbols to unicode characters.&lt;/p&gt;
 
-&lt;p&gt;[more]&lt;/p&gt;
+
 
 &lt;p&gt;&lt;em&gt;The code was updated 2009-12-17. I´m using Dictionary&amp;lt;string, string&amp;gt; instead.&lt;/em&gt;&lt;/p&gt;
 
-&lt;pre class="brush: csharp;"&gt;private static string ConvertSymbolToUnicode(string symbols)
+&lt;pre class="prettyprint"&gt;private static string ConvertSymbolToUnicode(string symbols)
 {
     Dictionary&amp;lt;string, string&amp;gt; chars = new Dictionary&amp;lt;string, string&amp;gt;();
 
-    chars.Add(&amp;quot;a&amp;quot;, &amp;quot;α&amp;quot;);
-    chars.Add(&amp;quot;b&amp;quot;, &amp;quot;β&amp;quot;);
-    chars.Add(&amp;quot;c&amp;quot;, &amp;quot;χ&amp;quot;);
-    chars.Add(&amp;quot;d&amp;quot;, &amp;quot;δ&amp;quot;);
-    chars.Add(&amp;quot;e&amp;quot;, &amp;quot;ε&amp;quot;);
-    chars.Add(&amp;quot;f&amp;quot;, &amp;quot;φ&amp;quot;);
-    chars.Add(&amp;quot;g&amp;quot;, &amp;quot;γ&amp;quot;);
-    chars.Add(&amp;quot;h&amp;quot;, &amp;quot;η&amp;quot;);
-    chars.Add(&amp;quot;i&amp;quot;, &amp;quot;ι&amp;quot;);
-    chars.Add(&amp;quot;j&amp;quot;, &amp;quot;ϕ&amp;quot;);
-    chars.Add(&amp;quot;k&amp;quot;, &amp;quot;κ&amp;quot;);
-    chars.Add(&amp;quot;l&amp;quot;, &amp;quot;λ&amp;quot;);
-    chars.Add(&amp;quot;m&amp;quot;, &amp;quot;μ&amp;quot;);
-    chars.Add(&amp;quot;n&amp;quot;, &amp;quot;ν&amp;quot;);
-    chars.Add(&amp;quot;o&amp;quot;, &amp;quot;ο&amp;quot;);
-    chars.Add(&amp;quot;p&amp;quot;, &amp;quot;π&amp;quot;);
-    chars.Add(&amp;quot;q&amp;quot;, &amp;quot;θ&amp;quot;);
-    chars.Add(&amp;quot;r&amp;quot;, &amp;quot;ρ&amp;quot;);
-    chars.Add(&amp;quot;s&amp;quot;, &amp;quot;σ&amp;quot;);
-    chars.Add(&amp;quot;t&amp;quot;, &amp;quot;τ&amp;quot;);
-    chars.Add(&amp;quot;u&amp;quot;, &amp;quot;υ&amp;quot;);
-    chars.Add(&amp;quot;v&amp;quot;, &amp;quot;ϖ&amp;quot;);
-    chars.Add(&amp;quot;w&amp;quot;, &amp;quot;ω&amp;quot;);
-    chars.Add(&amp;quot;x&amp;quot;, &amp;quot;ξ&amp;quot;);
-    chars.Add(&amp;quot;y&amp;quot;, &amp;quot;ψ&amp;quot;);
-    chars.Add(&amp;quot;z&amp;quot;, &amp;quot;ζ&amp;quot;);
-    chars.Add(&amp;quot;&amp;#229;&amp;quot;, &amp;quot;∑&amp;quot;);
-    chars.Add(&amp;quot;&amp;#228;&amp;quot;, &amp;quot;™&amp;quot;);
-    chars.Add(&amp;quot;&amp;#246;&amp;quot;, &amp;quot;?&amp;quot;);
-    chars.Add(&amp;quot;A&amp;quot;, &amp;quot;Α&amp;quot;);
-    chars.Add(&amp;quot;B&amp;quot;, &amp;quot;Β&amp;quot;);
-    chars.Add(&amp;quot;C&amp;quot;, &amp;quot;Χ&amp;quot;);
-    chars.Add(&amp;quot;D&amp;quot;, &amp;quot;Δ&amp;quot;);
-    chars.Add(&amp;quot;E&amp;quot;, &amp;quot;Ε&amp;quot;);
-    chars.Add(&amp;quot;F&amp;quot;, &amp;quot;Φ&amp;quot;);
-    chars.Add(&amp;quot;G&amp;quot;, &amp;quot;Γ&amp;quot;);
-    chars.Add(&amp;quot;H&amp;quot;, &amp;quot;Η&amp;quot;);
-    chars.Add(&amp;quot;I&amp;quot;, &amp;quot;Ι&amp;quot;);
-    chars.Add(&amp;quot;J&amp;quot;, &amp;quot;ϑ&amp;quot;);
-    chars.Add(&amp;quot;K&amp;quot;, &amp;quot;Κ&amp;quot;);
-    chars.Add(&amp;quot;L&amp;quot;, &amp;quot;Λ&amp;quot;);
-    chars.Add(&amp;quot;M&amp;quot;, &amp;quot;Μ&amp;quot;);
-    chars.Add(&amp;quot;N&amp;quot;, &amp;quot;Ν&amp;quot;);
-    chars.Add(&amp;quot;O&amp;quot;, &amp;quot;Ο&amp;quot;);
-    chars.Add(&amp;quot;P&amp;quot;, &amp;quot;Π&amp;quot;);
-    chars.Add(&amp;quot;Q&amp;quot;, &amp;quot;Θ&amp;quot;);
-    chars.Add(&amp;quot;R&amp;quot;, &amp;quot;Ρ&amp;quot;);
-    chars.Add(&amp;quot;S&amp;quot;, &amp;quot;Σ&amp;quot;);
-    chars.Add(&amp;quot;T&amp;quot;, &amp;quot;Τ&amp;quot;);
-    chars.Add(&amp;quot;U&amp;quot;, &amp;quot;Υ&amp;quot;);
-    chars.Add(&amp;quot;V&amp;quot;, &amp;quot;ς&amp;quot;);
-    chars.Add(&amp;quot;W&amp;quot;, &amp;quot;Ω&amp;quot;);
-    chars.Add(&amp;quot;X&amp;quot;, &amp;quot;Ξ&amp;quot;);
-    chars.Add(&amp;quot;Y&amp;quot;, &amp;quot;Ψ&amp;quot;);
-    chars.Add(&amp;quot;Z&amp;quot;, &amp;quot;Z&amp;quot;);
-    chars.Add(&amp;quot;&amp;#197;&amp;quot;, &amp;quot;⊕&amp;quot;);
-    chars.Add(&amp;quot;&amp;#196;&amp;quot;, &amp;quot;⊗&amp;quot;);
-    chars.Add(&amp;quot;&amp;#214;&amp;quot;, &amp;quot;√&amp;quot;);
-    chars.Add(&amp;quot;`&amp;quot;, &amp;quot;?&amp;quot;);
-    chars.Add(&amp;quot;1&amp;quot;, &amp;quot;1&amp;quot;);
-    chars.Add(&amp;quot;2&amp;quot;, &amp;quot;2&amp;quot;);
-    chars.Add(&amp;quot;3&amp;quot;, &amp;quot;3&amp;quot;);
-    chars.Add(&amp;quot;4&amp;quot;, &amp;quot;4&amp;quot;);
-    chars.Add(&amp;quot;5&amp;quot;, &amp;quot;5&amp;quot;);
-    chars.Add(&amp;quot;6&amp;quot;, &amp;quot;6&amp;quot;);
-    chars.Add(&amp;quot;7&amp;quot;, &amp;quot;7&amp;quot;);
-    chars.Add(&amp;quot;8&amp;quot;, &amp;quot;8&amp;quot;);
-    chars.Add(&amp;quot;9&amp;quot;, &amp;quot;9&amp;quot;);
-    chars.Add(&amp;quot;0&amp;quot;, &amp;quot;0&amp;quot;);
-    chars.Add(&amp;quot;-&amp;quot;, &amp;quot;−&amp;quot;);
-    chars.Add(&amp;quot;=&amp;quot;, &amp;quot;=&amp;quot;);
-    chars.Add(&amp;quot;\\&amp;quot;, &amp;quot;∴&amp;quot;);
-    chars.Add(&amp;quot;[&amp;quot;, &amp;quot;[&amp;quot;);
-    chars.Add(&amp;quot;]&amp;quot;, &amp;quot;]&amp;quot;);
-    chars.Add(&amp;quot;;&amp;quot;, &amp;quot;;&amp;quot;);
-    chars.Add(&amp;quot;'&amp;quot;, &amp;quot;∍&amp;quot;);
-    chars.Add(&amp;quot;,&amp;quot;, &amp;quot;,&amp;quot;);
-    chars.Add(&amp;quot;.&amp;quot;, &amp;quot;.&amp;quot;);
-    chars.Add(&amp;quot;/&amp;quot;, &amp;quot;/&amp;quot;);
-    chars.Add(&amp;quot;~&amp;quot;, &amp;quot;~&amp;quot;);
-    chars.Add(&amp;quot;!&amp;quot;, &amp;quot;!&amp;quot;);
-    chars.Add(&amp;quot;@&amp;quot;, &amp;quot;≅&amp;quot;);
-    chars.Add(&amp;quot;#&amp;quot;, &amp;quot;#&amp;quot;);
-    chars.Add(&amp;quot;$&amp;quot;, &amp;quot;∃&amp;quot;);
-    chars.Add(&amp;quot;%&amp;quot;, &amp;quot;%&amp;quot;);
-    chars.Add(&amp;quot;^&amp;quot;, &amp;quot;⊥&amp;quot;);
-    chars.Add(&amp;quot;&amp;amp;&amp;quot;, &amp;quot;&amp;amp;&amp;quot;);
-    chars.Add(&amp;quot;*&amp;quot;, &amp;quot;∗&amp;quot;);
-    chars.Add(&amp;quot;(&amp;quot;, &amp;quot;(&amp;quot;);
-    chars.Add(&amp;quot;)&amp;quot;, &amp;quot;)&amp;quot;);
-    chars.Add(&amp;quot;_&amp;quot;, &amp;quot;_&amp;quot;);
-    chars.Add(&amp;quot;+&amp;quot;, &amp;quot;+&amp;quot;);
-    chars.Add(&amp;quot;|&amp;quot;, &amp;quot;|&amp;quot;);
-    chars.Add(&amp;quot;{&amp;quot;, &amp;quot;{&amp;quot;);
-    chars.Add(&amp;quot;}&amp;quot;, &amp;quot;}&amp;quot;);
-    chars.Add(&amp;quot;:&amp;quot;, &amp;quot;:&amp;quot;);
-    chars.Add(&amp;quot;\&amp;quot;&amp;quot;, &amp;quot;∀&amp;quot;);
-    chars.Add(&amp;quot;&amp;lt;&amp;quot;, &amp;quot;&amp;lt;&amp;quot;);
-    chars.Add(&amp;quot;&amp;gt;&amp;quot;, &amp;quot;&amp;gt;&amp;quot;);
-    chars.Add(&amp;quot;?&amp;quot;, &amp;quot;?&amp;quot;);
-    chars.Add(&amp;quot;&amp;#163;&amp;quot;, &amp;quot;≤&amp;quot;);
-    chars.Add(&amp;quot;&amp;#164;&amp;quot;, &amp;quot;⁄&amp;quot;);
+    chars.Add("a", "α");
+    chars.Add("b", "β");
+    chars.Add("c", "χ");
+    chars.Add("d", "δ");
+    chars.Add("e", "ε");
+    chars.Add("f", "φ");
+    chars.Add("g", "γ");
+    chars.Add("h", "η");
+    chars.Add("i", "ι");
+    chars.Add("j", "ϕ");
+    chars.Add("k", "κ");
+    chars.Add("l", "λ");
+    chars.Add("m", "μ");
+    chars.Add("n", "ν");
+    chars.Add("o", "ο");
+    chars.Add("p", "π");
+    chars.Add("q", "θ");
+    chars.Add("r", "ρ");
+    chars.Add("s", "σ");
+    chars.Add("t", "τ");
+    chars.Add("u", "υ");
+    chars.Add("v", "ϖ");
+    chars.Add("w", "ω");
+    chars.Add("x", "ξ");
+    chars.Add("y", "ψ");
+    chars.Add("z", "ζ");
+    chars.Add("å", "∑");
+    chars.Add("ä", "™");
+    chars.Add("ö", "?");
+    chars.Add("A", "Α");
+    chars.Add("B", "Β");
+    chars.Add("C", "Χ");
+    chars.Add("D", "Δ");
+    chars.Add("E", "Ε");
+    chars.Add("F", "Φ");
+    chars.Add("G", "Γ");
+    chars.Add("H", "Η");
+    chars.Add("I", "Ι");
+    chars.Add("J", "ϑ");
+    chars.Add("K", "Κ");
+    chars.Add("L", "Λ");
+    chars.Add("M", "Μ");
+    chars.Add("N", "Ν");
+    chars.Add("O", "Ο");
+    chars.Add("P", "Π");
+    chars.Add("Q", "Θ");
+    chars.Add("R", "Ρ");
+    chars.Add("S", "Σ");
+    chars.Add("T", "Τ");
+    chars.Add("U", "Υ");
+    chars.Add("V", "ς");
+    chars.Add("W", "Ω");
+    chars.Add("X", "Ξ");
+    chars.Add("Y", "Ψ");
+    chars.Add("Z", "Z");
+    chars.Add("Å", "⊕");
+    chars.Add("Ä", "⊗");
+    chars.Add("Ö", "√");
+    chars.Add("`", "?");
+    chars.Add("1", "1");
+    chars.Add("2", "2");
+    chars.Add("3", "3");
+    chars.Add("4", "4");
+    chars.Add("5", "5");
+    chars.Add("6", "6");
+    chars.Add("7", "7");
+    chars.Add("8", "8");
+    chars.Add("9", "9");
+    chars.Add("0", "0");
+    chars.Add("-", "−");
+    chars.Add("=", "=");
+    chars.Add("\\", "∴");
+    chars.Add("[", "[");
+    chars.Add("]", "]");
+    chars.Add(";", ";");
+    chars.Add("'", "∍");
+    chars.Add(",", ",");
+    chars.Add(".", ".");
+    chars.Add("/", "/");
+    chars.Add("~", "~");
+    chars.Add("!", "!");
+    chars.Add("@", "≅");
+    chars.Add("#", "#");
+    chars.Add("$", "∃");
+    chars.Add("%", "%");
+    chars.Add("^", "⊥");
+    chars.Add("&amp;amp;", "&amp;amp;");
+    chars.Add("*", "∗");
+    chars.Add("(", "(");
+    chars.Add(")", ")");
+    chars.Add("_", "_");
+    chars.Add("+", "+");
+    chars.Add("|", "|");
+    chars.Add("{", "{");
+    chars.Add("}", "}");
+    chars.Add(":", ":");
+    chars.Add("\"", "∀");
+    chars.Add("&amp;lt;", "&amp;lt;");
+    chars.Add("&amp;gt;", "&amp;gt;");
+    chars.Add("?", "?");
+    chars.Add("£", "≤");
+    chars.Add("¤", "⁄");
 
     string returnValue = string.Empty;
 
@@ -135,24 +138,14 @@
 
 &lt;p&gt;And in my case I used it with following code:&lt;/p&gt;
 
-&lt;pre class="brush: csharp;"&gt;output = Regex.Replace(output, 
-    &amp;quot;&amp;lt;font[^&amp;gt;]*face=\&amp;quot;symbol\&amp;quot;[^&amp;gt;]*&amp;gt;(?&amp;lt;symbols&amp;gt;[^&amp;lt;]*)&amp;lt;/font&amp;gt;&amp;quot;,
-    m =&amp;gt; ConvertSymbolToUnicode(m.Groups[&amp;quot;symbols&amp;quot;].Value), 
-    RegexOptions.Compiled | RegexOptions.IgnoreCase);&lt;/pre&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2009-12-16 17:28:32</pubDate>
-  <lastModified>2009-12-17 13:36:00</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>convert-symbol-to-unicode</slug>
-  <tags>
-    <tag>pagedata</tag>
-    <tag>migration</tag>
-  </tags>
-	<comments />
+&lt;pre class="prettyprint"&gt;output = Regex.Replace(output, 
+    "&amp;lt;font[^&amp;gt;]*face=\"symbol\"[^&amp;gt;]*&amp;gt;(?&amp;lt;symbols&amp;gt;[^&amp;lt;]*)&amp;lt;/font&amp;gt;",
+    m =&amp;gt; ConvertSymbolToUnicode(m.Groups["symbols"].Value), 
+    RegexOptions.Compiled | RegexOptions.IgnoreCase);&lt;/pre&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications />
+  <comments></comments>
 </post>

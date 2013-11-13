@@ -4,16 +4,18 @@
   <slug>using-episerver-finds-unified-search-in-episerver-6</slug>
   <author>Johan</author>
   <pubDate>2013-02-25 18:30:00</pubDate>
-  <lastModified>2013-11-08 05:37:46</lastModified>
+  <lastModified>2013-11-13 05:26:04</lastModified>
   <content>
 		
 		
+		
+		
 		&lt;p&gt;So you've read Joels &lt;a href="http://joelabrahamsson.com/entry/new-in-episerver-find-unified-search"&gt;blogpost about Unified Search&lt;/a&gt; and want to try it out, great! It's actually — what I think — one of the cooler features of Find when it comes to actual search and not just querying for data. Too bad it's just for EPiServer 7, luckily some of the parts are backported to EPiServer 6.&lt;/p&gt;
-&lt;p&gt;[more]&lt;/p&gt;
+
 &lt;p&gt;So what's missing? We have to do most of the plumbing and hook up Find correctly, so everything is indexed, and we also have to add our own filters that resembles EPiServer's &lt;a href="http://sdk.episerver.com/library/cms6/html/T_EPiServer_Filters_FilterForVisitor.htm"&gt;FilterForVisitors&lt;/a&gt;. All of this could easily be done by EPiServer in a couple of days, but hey, we don't want to wait for that and it's not certain that this ever will be fully backported to EPiServer 6.&lt;/p&gt;
 &lt;p&gt;First you need to install Find, if you're going with nuget remember to specify the correct version so we don't get the EPiServer 7 Integration. You can find the instructions under My Services &amp;gt; Download .NET Api at &lt;a href="http://find.episerver.com"&gt;find.episerver.com&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;If you're using Page Type Builder you can implement the ISearchContent interface in a base class, some of the methods are implemented by default and some we want to override. In my example we're not actually implementing the interface but just overriding some of the properties by adding properties with the same name.&lt;/p&gt;
-&lt;pre class="prettyprint lang-c"&gt;namespace DV.PageTypes
+&lt;pre class="prettyprint"&gt;namespace DV.PageTypes
 {
     using System;
     using PageTypeBuilder;
@@ -89,7 +91,7 @@
 
 &lt;/pre&gt;
 &lt;p&gt;We also have to tell Find which types we want in our Unified  Search, in EPiServer 7 PageData and UnifiedFile is added automatically. This is preferredly done in an InitializableModule. Notice that we also adds a filter for each type, more on that later. For UnifiedFiles we can't obviously use a base class, so here we have to  go with extension methods. For some reason a property with the name  Attachment is added automatically, but Unified Search expects a property  with the name SearchAttachment. So first we have to remove the default  and add our own.&lt;/p&gt;
-&lt;pre class="brush: csharp;"&gt;var fileTypesToIndex = new List&amp;lt;string&amp;gt;
+&lt;pre class="prettyprint"&gt;var fileTypesToIndex = new List&amp;lt;string&amp;gt;
 {
     ".txt",
     ".pdf",
@@ -123,7 +125,7 @@ SearchClient.Instance.Conventions.ForInstancesOf&amp;lt;UnifiedFile&amp;gt;()
     .IncludeField(file =&amp;gt; file.SearchTitle());
 &lt;/pre&gt;
 &lt;p&gt;Here are some example extensions for UnifiedFile:&lt;/p&gt;
-&lt;pre class="brush: csharp;"&gt;namespace DV.Extensions
+&lt;pre class="prettyprint"&gt;namespace DV.Extensions
 {
     using EPiServer;
     using EPiServer.Find;
@@ -244,7 +246,7 @@ SearchClient.Instance.Conventions.ForInstancesOf&amp;lt;UnifiedFile&amp;gt;()
 }
 &lt;/pre&gt;
 &lt;p&gt;If you're not using Page Type Builder you can create extension methods for PageData with the same name for every property in ISearchContent and add them to the indexing conventions. The implementations are quite easy and straight forward so I'm not gonna post example code for that. SearchText is already implemented in the &lt;em&gt;EPiServer.Find.Cms&lt;/em&gt; namespace though, so add a using statement for that namespace.&lt;/p&gt;
-&lt;pre class="brush: csharp;"&gt;SearchClient.Instance.Conventions.ForInstancesOf&amp;lt;PageData&amp;gt;()
+&lt;pre class="prettyprint"&gt;SearchClient.Instance.Conventions.ForInstancesOf&amp;lt;PageData&amp;gt;()
     .IncludeField(page =&amp;gt; page.SearchText())
     .IncludeField(page =&amp;gt; page.SearchHitTypeName())
     .IncludeField(page =&amp;gt; page.SearchHitUrl())
@@ -259,6 +261,8 @@ SearchClient.Instance.Conventions.ForInstancesOf&amp;lt;UnifiedFile&amp;gt;()
 &lt;p&gt;There are some caveats using Unified Search with EPiServer 6, for instance pages are not re-indexed when the access rights are changed for pages and files. To be safe, enable the scheduled indexing job, so the ACLs are updated at least every night.&lt;/p&gt;
 &lt;p&gt;If you have any questions or found any bugs, please let me know.&lt;/p&gt;
 &lt;p&gt;Hope this helps and happy searching!&lt;/p&gt;
+	
+	
 	
 	
 	</content>

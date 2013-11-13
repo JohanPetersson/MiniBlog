@@ -1,13 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <author>Johan</author>
   <title>Country custom property</title>
-  <description />
-  <content>&lt;p&gt;Give your editors the possibility to select a country from a drop down list.&lt;/p&gt;
-&lt;p&gt;[more]&lt;/p&gt;
+  <slug>country-custom-property</slug>
+  <author>Johan</author>
+  <pubDate>2011-11-11 17:51:00</pubDate>
+  <lastModified>2013-11-13 05:35:32</lastModified>
+  <content>
+		&lt;p&gt;Give your editors the possibility to select a country from a drop down list.&lt;/p&gt;
+
 &lt;p&gt;This is a really simple custom property but shows how easy it is to extend &lt;a href="http://www.episerver.se"&gt;EPiServer&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;First we create the property...&lt;/p&gt;
-&lt;pre class="brush: csharp;"&gt;namespace DV.CustomProperties
+&lt;pre class="prettyprint"&gt;namespace DV.CustomProperties
 {
     using System;
     using EPiServer.Core;
@@ -26,7 +29,7 @@
     }
 }&lt;/pre&gt;
 &lt;p&gt;And then the control&lt;/p&gt;
-&lt;pre class="brush: csharp;"&gt;namespace DV.CustomProperties
+&lt;pre class="prettyprint"&gt;namespace DV.CustomProperties
 {
     using System;
     using System.Collections.Generic;
@@ -74,27 +77,27 @@
     }
 }&lt;/pre&gt;
 &lt;p&gt;When we want to display the value we can take advantage of the translation function.&lt;/p&gt;
-&lt;pre class="brush: xhtml;"&gt;&amp;lt;%= Translate(string.Concat("/countries/", CurrentPage["Country"])) %&amp;gt;&lt;/pre&gt;
-&lt;pre class="brush: xml;"&gt;&amp;lt;?xml version="1.0" encoding="utf-8" standalone="yes" ?&amp;gt;
+&lt;pre class="prettyprint"&gt;&amp;lt;%= Translate(string.Concat("/countries/", CurrentPage["Country"])) %&amp;gt;&lt;/pre&gt;
+&lt;pre class="prettyprint"&gt;&amp;lt;?xml version="1.0" encoding="utf-8" standalone="yes" ?&amp;gt;
 &amp;lt;languages&amp;gt;
   &amp;lt;language name="svenska" id="sv"&amp;gt;
     &amp;lt;countries&amp;gt;
       &amp;lt;ad&amp;gt;Andorra&amp;lt;/ad&amp;gt;
-      &amp;lt;ae&amp;gt;F&amp;ouml;renade Arabemiraten&amp;lt;/ae&amp;gt;
+      &amp;lt;ae&amp;gt;Förenade Arabemiraten&amp;lt;/ae&amp;gt;
       &amp;lt;af&amp;gt;Afghanistan&amp;lt;/af&amp;gt;
       &amp;lt;ag&amp;gt;Antigua och Barbuda&amp;lt;/ag&amp;gt;
       &amp;lt;ai&amp;gt;Anguilla&amp;lt;/ai&amp;gt;
       &amp;lt;al&amp;gt;Albanien&amp;lt;/al&amp;gt;
       &amp;lt;am&amp;gt;Armenien&amp;lt;/am&amp;gt;
-      &amp;lt;an&amp;gt;Nederl&amp;auml;ndska Antillerna&amp;lt;/an&amp;gt;
+      &amp;lt;an&amp;gt;Nederländska Antillerna&amp;lt;/an&amp;gt;
       &amp;lt;ao&amp;gt;Angola&amp;lt;/ao&amp;gt;
       &amp;lt;aq&amp;gt;Antarktis&amp;lt;/aq&amp;gt;
       &amp;lt;ar&amp;gt;Argentina&amp;lt;/ar&amp;gt;
       &amp;lt;as&amp;gt;Amerikanska Samoa&amp;lt;/as&amp;gt;
-      &amp;lt;at&amp;gt;&amp;Ouml;sterrike&amp;lt;/at&amp;gt;
+      &amp;lt;at&amp;gt;Österrike&amp;lt;/at&amp;gt;
       &amp;lt;au&amp;gt;Australien&amp;lt;/au&amp;gt;
       &amp;lt;aw&amp;gt;Aruba&amp;lt;/aw&amp;gt;
-      &amp;lt;ax&amp;gt;&amp;Aring;land&amp;lt;/ax&amp;gt;
+      &amp;lt;ax&amp;gt;Åland&amp;lt;/ax&amp;gt;
       &amp;lt;az&amp;gt;Azerbajdzjan&amp;lt;/az&amp;gt;
       &amp;lt;ba&amp;gt;Bosnien och Hercegovina&amp;lt;/ba&amp;gt;
       &amp;lt;bb&amp;gt;Barbados&amp;lt;/bb&amp;gt;
@@ -111,17 +114,17 @@
       &amp;lt;br&amp;gt;Brasilien&amp;lt;/br&amp;gt;
       &amp;lt;bs&amp;gt;Bahamas&amp;lt;/bs&amp;gt;
       &amp;lt;bt&amp;gt;Bhutan&amp;lt;/bt&amp;gt;
-      &amp;lt;bv&amp;gt;Bouvet&amp;ouml;n&amp;lt;/bv&amp;gt;
+      &amp;lt;bv&amp;gt;Bouvetön&amp;lt;/bv&amp;gt;
       &amp;lt;bw&amp;gt;Botswana&amp;lt;/bw&amp;gt;
       &amp;lt;by&amp;gt;Vitryssland&amp;lt;/by&amp;gt;
       &amp;lt;bz&amp;gt;Belize&amp;lt;/bz&amp;gt;
       &amp;lt;ca&amp;gt;Kanada&amp;lt;/ca&amp;gt;
-      &amp;lt;cc&amp;gt;Kokos&amp;ouml;arna&amp;lt;/cc&amp;gt;
+      &amp;lt;cc&amp;gt;Kokosöarna&amp;lt;/cc&amp;gt;
       &amp;lt;cf&amp;gt;Centralafrikanska republiken&amp;lt;/cf&amp;gt;
       &amp;lt;cg&amp;gt;Kongo-Brazzaville&amp;lt;/cg&amp;gt;
       &amp;lt;ch&amp;gt;Schweiz&amp;lt;/ch&amp;gt;
       &amp;lt;ci&amp;gt;Elfenbenskusten&amp;lt;/ci&amp;gt;
-      &amp;lt;ck&amp;gt;Cook&amp;ouml;arna&amp;lt;/ck&amp;gt;
+      &amp;lt;ck&amp;gt;Cooköarna&amp;lt;/ck&amp;gt;
       &amp;lt;cl&amp;gt;Chile&amp;lt;/cl&amp;gt;
       &amp;lt;cm&amp;gt;Kamerun&amp;lt;/cm&amp;gt;
       &amp;lt;cn&amp;gt;Kina&amp;lt;/cn&amp;gt;
@@ -129,7 +132,7 @@
       &amp;lt;cr&amp;gt;Costa Rica&amp;lt;/cr&amp;gt;
       &amp;lt;cu&amp;gt;Kuba&amp;lt;/cu&amp;gt;
       &amp;lt;cv&amp;gt;Kap Verde&amp;lt;/cv&amp;gt;
-      &amp;lt;cx&amp;gt;Jul&amp;ouml;n&amp;lt;/cx&amp;gt;
+      &amp;lt;cx&amp;gt;Julön&amp;lt;/cx&amp;gt;
       &amp;lt;cy&amp;gt;Cypern&amp;lt;/cy&amp;gt;
       &amp;lt;cz&amp;gt;Tjeckien&amp;lt;/cz&amp;gt;
       &amp;lt;de&amp;gt;Tyskland&amp;lt;/de&amp;gt;
@@ -141,17 +144,17 @@
       &amp;lt;ec&amp;gt;Ecuador&amp;lt;/ec&amp;gt;
       &amp;lt;ee&amp;gt;Estland&amp;lt;/ee&amp;gt;
       &amp;lt;eg&amp;gt;Egypten&amp;lt;/eg&amp;gt;
-      &amp;lt;eh&amp;gt;V&amp;auml;stsahara&amp;lt;/eh&amp;gt;
+      &amp;lt;eh&amp;gt;Västsahara&amp;lt;/eh&amp;gt;
       &amp;lt;er&amp;gt;Eritrea&amp;lt;/er&amp;gt;
       &amp;lt;es&amp;gt;Spanien&amp;lt;/es&amp;gt;
       &amp;lt;et&amp;gt;Etiopien&amp;lt;/et&amp;gt;
       &amp;lt;fi&amp;gt;Finland&amp;lt;/fi&amp;gt;
       &amp;lt;fj&amp;gt;Fiji&amp;lt;/fj&amp;gt;
-      &amp;lt;fk&amp;gt;Falklands&amp;ouml;arna&amp;lt;/fk&amp;gt;
+      &amp;lt;fk&amp;gt;Falklandsöarna&amp;lt;/fk&amp;gt;
       &amp;lt;fm&amp;gt;Mikronesiska federationen&amp;lt;/fm&amp;gt;
-      &amp;lt;fo&amp;gt;F&amp;auml;r&amp;ouml;arna&amp;lt;/fo&amp;gt;
+      &amp;lt;fo&amp;gt;Färöarna&amp;lt;/fo&amp;gt;
       &amp;lt;fr&amp;gt;Frankrike&amp;lt;/fr&amp;gt;
-      &amp;lt;fx&amp;gt;France m&amp;eacute;tropolitaine (Frankrike, europeiska delen)&amp;lt;/fx&amp;gt;
+      &amp;lt;fx&amp;gt;France métropolitaine (Frankrike, europeiska delen)&amp;lt;/fx&amp;gt;
       &amp;lt;ga&amp;gt;Gabon&amp;lt;/ga&amp;gt;
       &amp;lt;gb&amp;gt;Storbritannien&amp;lt;/gb&amp;gt;
       &amp;lt;gd&amp;gt;Grenada&amp;lt;/gd&amp;gt;
@@ -159,7 +162,7 @@
       &amp;lt;gf&amp;gt;Franska Guyana&amp;lt;/gf&amp;gt;
       &amp;lt;gh&amp;gt;Ghana&amp;lt;/gh&amp;gt;
       &amp;lt;gi&amp;gt;Gibraltar&amp;lt;/gi&amp;gt;
-      &amp;lt;gl&amp;gt;Gr&amp;ouml;nland&amp;lt;/gl&amp;gt;
+      &amp;lt;gl&amp;gt;Grönland&amp;lt;/gl&amp;gt;
       &amp;lt;gm&amp;gt;Gambia&amp;lt;/gm&amp;gt;
       &amp;lt;gn&amp;gt;Guinea&amp;lt;/gn&amp;gt;
       &amp;lt;gp&amp;gt;Guadeloupe&amp;lt;/gp&amp;gt;
@@ -170,7 +173,7 @@
       &amp;lt;gw&amp;gt;Guinea Bissau&amp;lt;/gw&amp;gt;
       &amp;lt;gy&amp;gt;Guyana&amp;lt;/gy&amp;gt;
       &amp;lt;hk&amp;gt;Hongkong&amp;lt;/hk&amp;gt;
-      &amp;lt;hm&amp;gt;Heard- och McDonalds&amp;ouml;arna&amp;lt;/hm&amp;gt;
+      &amp;lt;hm&amp;gt;Heard- och McDonaldsöarna&amp;lt;/hm&amp;gt;
       &amp;lt;hn&amp;gt;Honduras&amp;lt;/hn&amp;gt;
       &amp;lt;hr&amp;gt;Kroatien&amp;lt;/hr&amp;gt;
       &amp;lt;ht&amp;gt;Haiti&amp;lt;/ht&amp;gt;
@@ -196,7 +199,7 @@
       &amp;lt;kp&amp;gt;Nordkorea&amp;lt;/kp&amp;gt;
       &amp;lt;kr&amp;gt;Sydkorea&amp;lt;/kr&amp;gt;
       &amp;lt;kw&amp;gt;Kuwait&amp;lt;/kw&amp;gt;
-      &amp;lt;ky&amp;gt;Cayman&amp;ouml;arna&amp;lt;/ky&amp;gt;
+      &amp;lt;ky&amp;gt;Caymanöarna&amp;lt;/ky&amp;gt;
       &amp;lt;kz&amp;gt;Kazakstan&amp;lt;/kz&amp;gt;
       &amp;lt;la&amp;gt;Laos&amp;lt;/la&amp;gt;
       &amp;lt;lb&amp;gt;Libanon&amp;lt;/lb&amp;gt;
@@ -214,7 +217,7 @@
       &amp;lt;md&amp;gt;Moldavien&amp;lt;/md&amp;gt;
       &amp;lt;me&amp;gt;Montenegro&amp;lt;/me&amp;gt;
       &amp;lt;mg&amp;gt;Madagaskar&amp;lt;/mg&amp;gt;
-      &amp;lt;mh&amp;gt;Marshall&amp;ouml;arna&amp;lt;/mh&amp;gt;
+      &amp;lt;mh&amp;gt;Marshallöarna&amp;lt;/mh&amp;gt;
       &amp;lt;mk&amp;gt;Makedonien&amp;lt;/mk&amp;gt;
       &amp;lt;ml&amp;gt;Mali&amp;lt;/ml&amp;gt;
       &amp;lt;mm&amp;gt;Burma&amp;lt;/mm&amp;gt;
@@ -230,14 +233,14 @@
       &amp;lt;mw&amp;gt;Malawi&amp;lt;/mw&amp;gt;
       &amp;lt;mx&amp;gt;Mexiko&amp;lt;/mx&amp;gt;
       &amp;lt;my&amp;gt;Malaysia&amp;lt;/my&amp;gt;
-      &amp;lt;mz&amp;gt;Mo&amp;ccedil;ambique&amp;lt;/mz&amp;gt;
+      &amp;lt;mz&amp;gt;Moçambique&amp;lt;/mz&amp;gt;
       &amp;lt;na&amp;gt;Namibia&amp;lt;/na&amp;gt;
       &amp;lt;nc&amp;gt;Nya Kaledonien&amp;lt;/nc&amp;gt;
       &amp;lt;ne&amp;gt;Niger&amp;lt;/ne&amp;gt;
-      &amp;lt;nf&amp;gt;Norfolk&amp;ouml;n&amp;lt;/nf&amp;gt;
+      &amp;lt;nf&amp;gt;Norfolkön&amp;lt;/nf&amp;gt;
       &amp;lt;ng&amp;gt;Nigeria&amp;lt;/ng&amp;gt;
       &amp;lt;ni&amp;gt;Nicaragua&amp;lt;/ni&amp;gt;
-      &amp;lt;nl&amp;gt;Nederl&amp;auml;nderna&amp;lt;/nl&amp;gt;
+      &amp;lt;nl&amp;gt;Nederländerna&amp;lt;/nl&amp;gt;
       &amp;lt;no&amp;gt;Norge&amp;lt;/no&amp;gt;
       &amp;lt;np&amp;gt;Nepal&amp;lt;/np&amp;gt;
       &amp;lt;nr&amp;gt;Nauru&amp;lt;/nr&amp;gt;
@@ -252,19 +255,19 @@
       &amp;lt;pk&amp;gt;Pakistan&amp;lt;/pk&amp;gt;
       &amp;lt;pl&amp;gt;Polen&amp;lt;/pl&amp;gt;
       &amp;lt;pm&amp;gt;Saint-Pierre och Miquelon&amp;lt;/pm&amp;gt;
-      &amp;lt;pn&amp;gt;Pitcairn&amp;ouml;arna&amp;lt;/pn&amp;gt;
+      &amp;lt;pn&amp;gt;Pitcairnöarna&amp;lt;/pn&amp;gt;
       &amp;lt;pr&amp;gt;Puerto Rico&amp;lt;/pr&amp;gt;
       &amp;lt;pt&amp;gt;Portugal&amp;lt;/pt&amp;gt;
       &amp;lt;pw&amp;gt;Palau&amp;lt;/pw&amp;gt;
       &amp;lt;py&amp;gt;Paraguay&amp;lt;/py&amp;gt;
       &amp;lt;qa&amp;gt;Qatar&amp;lt;/qa&amp;gt;
-      &amp;lt;re&amp;gt;R&amp;eacute;union&amp;lt;/re&amp;gt;
-      &amp;lt;ro&amp;gt;Rum&amp;auml;nien&amp;lt;/ro&amp;gt;
+      &amp;lt;re&amp;gt;Réunion&amp;lt;/re&amp;gt;
+      &amp;lt;ro&amp;gt;Rumänien&amp;lt;/ro&amp;gt;
       &amp;lt;rs&amp;gt;Serbien&amp;lt;/rs&amp;gt;
       &amp;lt;ru&amp;gt;Ryssland&amp;lt;/ru&amp;gt;
       &amp;lt;rw&amp;gt;Rwanda&amp;lt;/rw&amp;gt;
       &amp;lt;sa&amp;gt;Saudiarabien&amp;lt;/sa&amp;gt;
-      &amp;lt;sb&amp;gt;Salomon&amp;ouml;arna&amp;lt;/sb&amp;gt;
+      &amp;lt;sb&amp;gt;Salomonöarna&amp;lt;/sb&amp;gt;
       &amp;lt;sc&amp;gt;Seychellerna&amp;lt;/sc&amp;gt;
       &amp;lt;sd&amp;gt;Sudan&amp;lt;/sd&amp;gt;
       &amp;lt;se&amp;gt;Sverige&amp;lt;/se&amp;gt;
@@ -278,21 +281,21 @@
       &amp;lt;sn&amp;gt;Senegal&amp;lt;/sn&amp;gt;
       &amp;lt;so&amp;gt;Somalia&amp;lt;/so&amp;gt;
       &amp;lt;sr&amp;gt;Surinam&amp;lt;/sr&amp;gt;
-      &amp;lt;st&amp;gt;S&amp;atilde;o Tom&amp;eacute; och Pr&amp;iacute;ncipe&amp;lt;/st&amp;gt;
+      &amp;lt;st&amp;gt;São Tomé och Príncipe&amp;lt;/st&amp;gt;
       &amp;lt;sv&amp;gt;El Salvador&amp;lt;/sv&amp;gt;
       &amp;lt;sy&amp;gt;Syrien&amp;lt;/sy&amp;gt;
       &amp;lt;sz&amp;gt;Swaziland&amp;lt;/sz&amp;gt;
-      &amp;lt;tc&amp;gt;Turks- och Caicos&amp;ouml;arna&amp;lt;/tc&amp;gt;
+      &amp;lt;tc&amp;gt;Turks- och Caicosöarna&amp;lt;/tc&amp;gt;
       &amp;lt;td&amp;gt;Tchad&amp;lt;/td&amp;gt;
-      &amp;lt;tf&amp;gt;Franska s&amp;ouml;dra territorierna&amp;lt;/tf&amp;gt;
+      &amp;lt;tf&amp;gt;Franska södra territorierna&amp;lt;/tf&amp;gt;
       &amp;lt;tg&amp;gt;Togo&amp;lt;/tg&amp;gt;
       &amp;lt;th&amp;gt;Thailand&amp;lt;/th&amp;gt;
       &amp;lt;tj&amp;gt;Tadzjikistan&amp;lt;/tj&amp;gt;
-      &amp;lt;tk&amp;gt;Tokelau&amp;ouml;arna&amp;lt;/tk&amp;gt;
+      &amp;lt;tk&amp;gt;Tokelauöarna&amp;lt;/tk&amp;gt;
       &amp;lt;tm&amp;gt;Turkmenistan&amp;lt;/tm&amp;gt;
       &amp;lt;tn&amp;gt;Tunisien&amp;lt;/tn&amp;gt;
       &amp;lt;to&amp;gt;Tonga&amp;lt;/to&amp;gt;
-      &amp;lt;tp&amp;gt;&amp;Ouml;sttimor&amp;lt;/tp&amp;gt;
+      &amp;lt;tp&amp;gt;Östtimor&amp;lt;/tp&amp;gt;
       &amp;lt;tr&amp;gt;Turkiet&amp;lt;/tr&amp;gt;
       &amp;lt;tt&amp;gt;Trinidad och Tobago&amp;lt;/tt&amp;gt;
       &amp;lt;tv&amp;gt;Tuvalu&amp;lt;/tv&amp;gt;
@@ -300,18 +303,18 @@
       &amp;lt;tz&amp;gt;Tanzania&amp;lt;/tz&amp;gt;
       &amp;lt;ua&amp;gt;Ukraina&amp;lt;/ua&amp;gt;
       &amp;lt;ug&amp;gt;Uganda&amp;lt;/ug&amp;gt;
-      &amp;lt;um&amp;gt;USA:s yttre &amp;ouml;ar&amp;lt;/um&amp;gt;
+      &amp;lt;um&amp;gt;USA:s yttre öar&amp;lt;/um&amp;gt;
       &amp;lt;us&amp;gt;USA&amp;lt;/us&amp;gt;
       &amp;lt;uy&amp;gt;Uruguay&amp;lt;/uy&amp;gt;
       &amp;lt;uz&amp;gt;Uzbekistan&amp;lt;/uz&amp;gt;
       &amp;lt;va&amp;gt;Vatikanstaten&amp;lt;/va&amp;gt;
       &amp;lt;vc&amp;gt;Saint Vincent och Grenadinerna&amp;lt;/vc&amp;gt;
       &amp;lt;ve&amp;gt;Venezuela&amp;lt;/ve&amp;gt;
-      &amp;lt;vg&amp;gt;Brittiska Jungfru&amp;ouml;arna&amp;lt;/vg&amp;gt;
-      &amp;lt;vi&amp;gt;Amerikanska Jungfru&amp;ouml;arna&amp;lt;/vi&amp;gt;
+      &amp;lt;vg&amp;gt;Brittiska Jungfruöarna&amp;lt;/vg&amp;gt;
+      &amp;lt;vi&amp;gt;Amerikanska Jungfruöarna&amp;lt;/vi&amp;gt;
       &amp;lt;vn&amp;gt;Vietnam&amp;lt;/vn&amp;gt;
       &amp;lt;vu&amp;gt;Vanuatu&amp;lt;/vu&amp;gt;
-      &amp;lt;wf&amp;gt;Wallis- och Futuna&amp;ouml;arna&amp;lt;/wf&amp;gt;
+      &amp;lt;wf&amp;gt;Wallis- och Futunaöarna&amp;lt;/wf&amp;gt;
       &amp;lt;ws&amp;gt;Samoa&amp;lt;/ws&amp;gt;
       &amp;lt;ye&amp;gt;Jemen&amp;lt;/ye&amp;gt;
       &amp;lt;yt&amp;gt;Mayotte&amp;lt;/yt&amp;gt;
@@ -320,20 +323,11 @@
       &amp;lt;zw&amp;gt;Zimbabwe&amp;lt;/zw&amp;gt;
     &amp;lt;/countries&amp;gt;
   &amp;lt;/language&amp;gt;
-&amp;lt;/languages&amp;gt;&lt;/pre&gt;</content>
-  <ispublished>True</ispublished>
-  <iscommentsenabled>True</iscommentsenabled>
-  <pubDate>2011-11-11 17:51:00</pubDate>
-  <lastModified>2011-12-01 20:51:13</lastModified>
-  <raters>0</raters>
-  <rating>0</rating>
-  <slug>country-custom-property</slug>
-  <tags>
-    <tag>custom property</tag>
-  </tags>
-  <comments />
+&amp;lt;/languages&amp;gt;&lt;/pre&gt;
+	</content>
+  <ispublished>true</ispublished>
   <categories>
     <category>EPiServer</category>
   </categories>
-  <notifications />
+  <comments></comments>
 </post>
