@@ -1,6 +1,6 @@
 ﻿<!doctype html>
 <html lang="en-us">
-<head prefix="og: http://ogp.me/ns#">
+<head>
     <meta charset="utf-8" />
 	<title>@Page.Title</title>
 
@@ -20,24 +20,19 @@
 	{
 		<link href="@Blog.FingerPrint("/css/admin.css")" rel="stylesheet" />
 	}
-
-	<meta property="og:title" content="@Page.Title" />
-	<meta property="og:type" content="website" />
-	<meta property="og:url" content="@(Request.Url.Scheme + "://" + Request.Url.Authority + Request.RawUrl)" />
 </head>
 <body itemscope itemtype="http://schema.org/Blog" class="@(User.Identity.IsAuthenticated ? "admin" : null)">
 	<div class="container">
-        <div class="row">
+		<div class="row">
 			<header role="banner" class="about col-md-3">
 				<img src="/themes/@Blog.Theme/johan.jpg" class="img-circle" width="140" alt="" />
-				<span itemprop="name" class="sr-only">
+				<h1 itemprop="name" class="sr-only">
 					<a href="~/" itemprop="url">@Blog.Title</a>
-				</span>
-				<em class="sr-only">By Johan Petersson</em>
+				</h1>
 				<p>
 					My name is Johan Petersson and I´m working as a developer at <a href="http://www.netrelations.com/en-us/">NetRelations</a> in Los Angeles.<br />
 					I´m very interested in developing user interfaces and server-side stuff.<br />
-					In my spare time I like to ski downhill, drive my green rocket and dive into the ocean.
+					In my spare time I like to ski downhill, ride my green rocket and dive into the ocean.
 				</p>
 				<p><a href="https://twitter.com/dodavinkeln">twitter.com/dodavinkeln</a></p>
 				<p><a href="http://www.linkedin.com/in/peterssonjohan">linkedin.com/in/peterssonjohan</a></p>

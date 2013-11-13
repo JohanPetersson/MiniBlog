@@ -21,6 +21,11 @@ img, video, iframe {
     max-width: 100%;
 }
 
+pre {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
 .container {
     min-height: 100%;
     padding: 4em 1em;
