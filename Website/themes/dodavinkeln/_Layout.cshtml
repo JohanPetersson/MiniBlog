@@ -44,7 +44,7 @@
 				@if (Page.ShowPaging != null)
 				{
 					<ul class="pager">
-						@if (Blog.GetPosts(Blog.PostsPerPage * 2).Count() > Blog.PostsPerPage)
+						@if (Blog.GetPosts().Count() > Blog.PostsPerPage * Blog.CurrentPage)
 						{
 							<li class="next"><a href="@Blog.GetPagingUrl(1)" rel="next">Older <span class="glyphicon glyphicon-chevron-right"></span></a></li>
 						}
