@@ -12,7 +12,7 @@
 	</header>
 
 	<div itemprop="articleBody">
-		@Html.Raw(Model.Content)
+		@Html.Raw(Blog.IsEditing ? Model.Content : Model.GetHtmlContent())
 	</div>
 
 	@if (Blog.CurrentPost != null)
