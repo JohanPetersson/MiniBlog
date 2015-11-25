@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Wrap properties with extra markup</title>
+  <slug>wrap-properties-with-extra-markup</slug>
+  <author></author>
+  <pubDate>2014-07-06 02:09:25</pubDate>
+  <lastModified>2014-07-06 02:09:25</lastModified>
+  <content>&lt;p&gt;I’m still on my quest for clean markup and a nice editor experience. Please see my previous &lt;a href="/post/how-to-handle-links-in-blocks"&gt;post how about to handle wrapping links&lt;/a&gt;. In this post I will cover a way to add wrapper markup to properties, that is only rendered in edit mode or when the properties have values. Notice that this will work for multiple properties, since quite often we have markup that wraps more than one property. So why would we even bother about this, you might ask? Well, sometimes we have styling that will apply to the wrapping markup, that we don’t want to show if the properties doesn’t have a value.&lt;/p&gt;  &lt;p&gt;I don’t think there is much to say about the code, it’s very self-explanatory, so here it comes:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;namespace DV.WebControls
+{
+    using System;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Web.UI;
+    using System.Web.UI.WebControls;
+
+    using EPiServer.Editor;
+    using EPiServer.ServiceLocation;
+    using EPiServer.Web;
+
+    public enum EvaluationType
+    {
+        Any,
+        All
+    }
+
+    /// &amp;lt;summary&amp;gt;
+    ///     A web control that always renders all child controls in edit mode. In view mode all specified
+    ///     properties' value is evaluated. If the evalutation is successful according to the specified EvaluationType,
+    ///     all child controls are rendered. Otherwise no child controls are rendered.
+    /// &amp;lt;/summary&amp;gt;
+    [ParseChildren(false)]
+    [PersistChildren(true)]
+    public class PropertyPlaceHolder : Control
+    {
+        /// &amp;lt;summary&amp;gt;
+        ///     Initializes a new instance of the &amp;lt;see cref=&amp;quot;PropertyPlaceHolder&amp;quot; /&amp;gt; class.
+        /// &amp;lt;/summary&amp;gt;
+        public PropertyPlaceHolder()
+        {
+            this.EvaluationType = EvaluationType.Any;
+        }
+
+        /// &amp;lt;summary&amp;gt;
+        ///     Gets or sets the type of the evaluation.
+        /// &amp;lt;/summary&amp;gt;
+        public EvaluationType EvaluationType { get; set; }
+
+        /// &amp;lt;summary&amp;gt;
+        ///     Gets or sets the name of the property.
+        /// &amp;lt;/summary&amp;gt;
+        [TypeConverter(typeof(StringArrayConverter))]
+        public string[] PropertyName { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+        private Injected&amp;lt;ControlRenderContextBuilder&amp;gt; ContextBuilder { get; set; }
+
+        /// &amp;lt;summary&amp;gt;
+        ///     Raises the &amp;lt;see cref=&amp;quot;E:System.Web.UI.Control.Load&amp;quot; /&amp;gt; event.
+        /// &amp;lt;/summary&amp;gt;
+        /// &amp;lt;param name=&amp;quot;e&amp;quot;&amp;gt;The &amp;lt;see cref=&amp;quot;T:System.EventArgs&amp;quot; /&amp;gt; object that contains the event data.&amp;lt;/param&amp;gt;
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (this.Visible &amp;amp;&amp;amp; this.PropertyName != null)
+            {
+                if (this.EvaluationType == EvaluationType.Any)
+                {
+                    this.Visible = this.PropertyName.Any(this.ShouldRenderControl);
+                }
+
+                if (this.EvaluationType == EvaluationType.All)
+                {
+                    this.Visible = this.PropertyName.All(this.ShouldRenderControl);
+                }
+            }
+        }
+
+        private bool ShouldRenderControl(string propertyName)
+        {
+            var propertyContext = this.ContextBuilder.Service.BuildContext(this, propertyName);
+
+            if (PageEditing.PageIsInEditMode)
+            {
+                return propertyContext.IsEditable();
+            }
+
+            var property = propertyContext.PropertyContainer.Property[propertyName];
+
+            // In view mode, we only need to check if the property
+            // has a value or not.
+            return property != null &amp;amp;&amp;amp; property.IsNull == false;
+        }
+    }
+}&lt;/pre&gt;
+
+&lt;h2&gt;Here are some examples on how we can use the control&lt;/h2&gt;
+
+&lt;p&gt;In this first example we want to wrap a content area with teaser blocks:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;DV:PropertyPlaceHolder PropertyName=&amp;quot;Teasers&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+	&amp;lt;div class=&amp;quot;teaser-listing&amp;quot;&amp;gt;
+		&amp;lt;div class=&amp;quot;wrapper&amp;quot;&amp;gt;
+			&amp;lt;EPiServer:Property PropertyName=&amp;quot;Teasers&amp;quot; CssClass=&amp;quot;m-cols-2&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+				&amp;lt;RenderSettings ChildrenCssClass=&amp;quot;m-col&amp;quot; /&amp;gt;
+			&amp;lt;/EPiServer:Property&amp;gt;
+		&amp;lt;/div&amp;gt;
+	&amp;lt;/div&amp;gt;
+&amp;lt;/DV:PropertyPlaceHolder&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;In this second example we want to create a definition list of a bunch of contact information properties, notice that the dl element will get rendered if any of the specified properties have a value:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;DV:PropertyPlaceHolder PropertyName=&amp;quot;Department,Office,Email,Telephone&amp;quot; EvaluationType=&amp;quot;Any&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+	&amp;lt;dl&amp;gt;
+		&amp;lt;DV:PropertyPlaceHolder PropertyName=&amp;quot;Department&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+			&amp;lt;dt&amp;gt;Department&amp;lt;/dt&amp;gt;
+			&amp;lt;EPiServer:Property PropertyName=&amp;quot;Department&amp;quot; CustomTagName=&amp;quot;dd&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;
+		&amp;lt;/DV:PropertyPlaceHolder&amp;gt;
+
+		&amp;lt;DV:PropertyPlaceHolder PropertyName=&amp;quot;Office&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+			&amp;lt;dt&amp;gt;Office&amp;lt;/dt&amp;gt;
+			&amp;lt;EPiServer:Property PropertyName=&amp;quot;Office&amp;quot; CustomTagName=&amp;quot;dd&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;
+		&amp;lt;/DV:PropertyPlaceHolder&amp;gt;
+
+		&amp;lt;DV:PropertyPlaceHolder PropertyName=&amp;quot;Email&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+			&amp;lt;dt&amp;gt;Email&amp;lt;/dt&amp;gt;
+			&amp;lt;EPiServer:Property PropertyName=&amp;quot;Email&amp;quot; CustomTagName=&amp;quot;dd&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;
+		&amp;lt;/DV:PropertyPlaceHolder&amp;gt;
+
+		&amp;lt;DV:PropertyPlaceHolder PropertyName=&amp;quot;Telephone&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+			&amp;lt;dt&amp;gt;Telephone&amp;lt;/dt&amp;gt;
+			&amp;lt;EPiServer:Property PropertyName=&amp;quot;Telephone&amp;quot; CustomTagName=&amp;quot;dd&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;
+		&amp;lt;/DV:PropertyPlaceHolder&amp;gt;
+	&amp;lt;/dl&amp;gt;
+&amp;lt;/DV:PropertyPlaceHolder&amp;gt;&lt;/pre&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Custom rendering settings</title>
+  <slug>custom-rendering-settings</slug>
+  <author></author>
+  <pubDate>2014-01-21 00:30:17</pubDate>
+  <lastModified>2014-01-21 00:30:17</lastModified>
+  <content>&lt;p&gt;Sometimes you want a small variation of a block. E.g. in one content area you want the teaser blocks to have headings and in another area no headings. You basically have two options to achieve this; use tags to select another renderer or the new layout feature in EPiServer 7.5 (which basically works as tags). Both options involves using a new renderer and you have to repeat most of the functionality in the alternative renderer. This is often unnecessary and doesn’t comply with the &lt;a href="http://en.wikipedia.org/wiki/Don%27t_repeat_yourself"&gt;DRY principle&lt;/a&gt;.&lt;/p&gt;  &lt;p&gt;Instead we could just pass a custom rendering setting to the rendering control:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;&amp;lt;EPiServer:Property PropertyName=&amp;quot;SidebarTeasers&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+	&amp;lt;RenderSettings ShowHeadings=&amp;quot;true&amp;quot; /&amp;gt;
+&amp;lt;/EPiServer:Property&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;Unfortunately there is no way to retrieve these settings Out-of-the-Box in EPiServer, at least not that I know of. But this is quite easy to solve by just traversing the control tree and get the &lt;strong&gt;Property Data Control&lt;/strong&gt;, at least in webforms.&lt;/p&gt;
+
+&lt;p&gt;First we need the Property Data Control:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;private PropertyDataControl propertyDataControl;
+
+protected PropertyDataControl PropertyDataControl
+{
+    get
+    {
+        if (this.propertyDataControl == null)
+        {
+            Control parent = this.Parent;
+
+            while (this.propertyDataControl == null &amp;amp;&amp;amp; parent != null)
+            {
+                this.propertyDataControl = parent as PropertyDataControl;
+
+                parent = parent.Parent;
+            }
+        }
+
+        return this.propertyDataControl;
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;And from the Property Data Control we can get the rendering settings:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;protected IDictionary&amp;lt;string, object&amp;gt; RenderSettings
+{
+    get
+    {
+        if (this.PropertyDataControl != null)
+        {
+            return this.PropertyDataControl.RenderSettings;
+        }
+
+        return new Dictionary&amp;lt;string, object&amp;gt;();
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;The complete code-behind for the block control with the ShowHeadings property:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;namespace DV.Views.Blocks
+{
+    using EPiServer.Core;
+    using EPiServer.Web;
+    using EPiServer.Web.PropertyControls;
+    using System.Collections.Generic;
+    using System.Web.UI;
+
+    public partial class TeaserControl : BlockControlBase&amp;lt;TeaserBlock&amp;gt;
+    {
+        #region Fields
+
+        private PropertyDataControl propertyDataControl;
+
+        #endregion
+
+        protected IDictionary&amp;lt;string, object&amp;gt; RenderSettings
+        {
+            get
+            {
+                if (this.PropertyDataControl != null)
+                {
+                    return this.PropertyDataControl.RenderSettings;
+                }
+
+                return new Dictionary&amp;lt;string, object&amp;gt;();
+            }
+        }
+
+        protected PropertyDataControl PropertyDataControl
+        {
+            get
+            {
+                if (this.propertyDataControl == null)
+                {
+                    Control parent = this.Parent;
+
+                    while (this.propertyDataControl == null &amp;amp;&amp;amp; parent != null)
+                    {
+                        this.propertyDataControl = parent as PropertyDataControl;
+
+                        parent = parent.Parent;
+                    }
+                }
+
+                return this.propertyDataControl;
+            }
+        }
+
+        protected bool ShowHeadings
+        {
+            get
+            {
+                bool showHeadings = true;
+
+                if (this.RenderSettings.ContainsKey(&amp;quot;ShowHeadings&amp;quot;))
+                {
+                    bool.TryParse(this.RenderSettings.ItemAs&amp;lt;string&amp;gt;(&amp;quot;ShowHeadings&amp;quot;), out showHeadings);
+                }
+
+                return showHeadings;
+            }
+        }
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;And the front-end:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;%@ Control Language=&amp;quot;C#&amp;quot; AutoEventWireup=&amp;quot;false&amp;quot; CodeBehind=&amp;quot;TeaserControl.ascx.cs&amp;quot; Inherits=&amp;quot;DV.Views.Blocks.TeaserControl&amp;quot; %&amp;gt;
+
+&amp;lt;EPiServer:Property PropertyName=&amp;quot;Heading&amp;quot; CustomTagName=&amp;quot;h2&amp;quot; Visible=&amp;quot;&amp;lt;%# this.ShowHeadings %&amp;gt;&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;
+
+&amp;lt;EPiServer:Property PropertyName=&amp;quot;Content&amp;quot; runat=&amp;quot;server&amp;quot; /&amp;gt;&lt;/pre&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Generate a download link to a file</title>
+  <slug>generate-a-download-link-to-a-file</slug>
+  <author></author>
+  <pubDate>2015-09-23 13:19:19</pubDate>
+  <lastModified>2015-09-23 13:47:32</lastModified>
+  <excerpt></excerpt>
+  <content>&lt;p&gt;This is somewhat of a hidden feature in EPiServer. But there is actually a built-in feature to send a download dialog to the user instead of opening the file directly. Soon the download attribute, that you can set on anchors, will work in all browsers but in the meanwhile we can do:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;public static string GetDownloadLink(this ContentReference contentReferenceToMediaFile)
+{
+    var url = UrlResolver.Current.GetUrl(contentReferenceToMediaFile);
+
+    return url + &amp;quot;/download&amp;quot;;
+}&lt;/pre&gt;
+
+&lt;p&gt;The important part here is of course &lt;code&gt;/download&lt;/code&gt;. For images you can add &lt;code&gt;/thumbnail&lt;/code&gt; (or the name of another blob property) to get the thumbnail of the image.&lt;/p&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

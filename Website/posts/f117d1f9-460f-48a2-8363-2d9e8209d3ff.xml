@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>How to create an editable 404 page</title>
+  <slug>how-to-create-an-editable-404-page</slug>
+  <author></author>
+  <pubDate>2014-08-28 16:33:14</pubDate>
+  <lastModified>2015-02-24 17:08:46</lastModified>
+  <excerpt></excerpt>
+  <content>&lt;p&gt;Every website should have a friendly 404 page. It’s also nice to give your clients the possibility to edit the content of the 404 page and maybe add a contact form as well. But how do we do it?&lt;/p&gt;  &lt;p&gt;First we need a model for the 404 page:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;namespace DV.Models
+{
+    using EPiServer.Core;
+    using EPiServer.DataAbstraction;
+    using EPiServer.DataAnnotations;
+
+    [ContentType(
+        GUID = &amp;quot;7ae4e3c3-d873-4e0b-a4ca-be7435bfd124&amp;quot;)]
+    [AvailableContentTypes(
+       Availability = Availability.None)]
+    public class NotFoundPage : PageData
+    {
+        public override void SetDefaultValues(ContentType contentType)
+        {
+            base.SetDefaultValues(contentType);
+
+            this.VisibleInMenu = false; 
+        }
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;Then we need a template for the page and more importantly, we need to set the status code to 404:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;namespace DV.Views
+{
+    using EPiServer;
+    using EPiServer.Editor;
+    using log4net;
+    using System;
+    using DV.Models;
+
+    public partial class NotFound : TemplatePage&amp;lt;NotFoundPage&amp;gt;
+    {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(NotFound));
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            // Only set status code on GET and in view mode
+            if (!PageEditing.PageIsInEditMode &amp;amp;&amp;amp; Request.HttpMethod == &amp;quot;GET&amp;quot;)
+            {
+                Log.InfoFormat(&amp;quot;404 {0}&amp;quot;, Request.QueryString[&amp;quot;aspxerrorpath&amp;quot;] ?? Request.RawUrl);
+
+                this.Response.Status = &amp;quot;404 not found&amp;quot;;
+                this.Response.StatusCode = 404;
+            }
+        }
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;It’s also good practice to log all the requests that are not found, this way we can determine if we need to set up rewrite rules for some of the missing resources. You would probably do this with Google Analytics as well. Notice that &lt;strong&gt;Request.RawUrl&lt;/strong&gt; will contain the actual requested url!&lt;/p&gt;
+
+&lt;p&gt;Now we need to tell the application to route all 404’s to this page. This can be done by redirecting to a hard-coded url, e.g. /page-not-found/ or /views/notfound.aspx. But that’s not that nice. A better way is to just execute the url to the 404 page and keep the requested url in the address bar. This is easily done with some configuration inside the system.webServer section of web.config:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;system.webServer&amp;gt;
+	&amp;lt;httpErrors errorMode=&amp;quot;Custom&amp;quot;&amp;gt;
+		&amp;lt;remove statusCode=&amp;quot;404&amp;quot; /&amp;gt;
+		&amp;lt;error statusCode=&amp;quot;404&amp;quot; path=&amp;quot;/Views/NotFound.aspx&amp;quot; responseMode=&amp;quot;ExecuteURL&amp;quot; /&amp;gt;
+	&amp;lt;/httpErrors&amp;gt;
+&amp;lt;/system.webServer&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;The important part here is the responseMode. You could set it to just Redirect, but it’s much more clean to just execute the 404 page and keep the requested url. Then we need to turn off EPiServer’s error handling:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;episerver&amp;gt;
+	&amp;lt;applicationSettings globalErrorHandling=&amp;quot;Off&amp;quot; /&amp;gt;
+&amp;lt;/episerver&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;Best practice is to also to configure customErrors inside system.Web:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;system.web&amp;gt;
+	&amp;lt;customErrors defaultRedirect=&amp;quot;/Views/NotFound.aspx&amp;quot; mode=&amp;quot;Off&amp;quot; redirectMode=&amp;quot;ResponseRewrite&amp;quot;&amp;gt;
+		&amp;lt;error statusCode=&amp;quot;404&amp;quot; redirect=&amp;quot;/Views/NotFound.aspx&amp;quot; /&amp;gt;
+	&amp;lt;/customErrors&amp;gt;
+&amp;lt;/system.web&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;We do not have ExecuteURL here, but ResponseRewrite is the equivalent. Now all the 404’s will execute our template instead. But wait a minute, the content is not loading! That’s because the url cannot be resolved to any content, hence the 404. So we need to tell which page to actually load. In this case we will add a property to the start page, so an editor can select the 404 page:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;[AllowedTypes(new[] { typeof(NotFoundPage) })]
+public virtual PageReference NotFoundPage { get; set; }&lt;/pre&gt;
+
+&lt;p&gt;And in the code-behind of our 404 template we just load that page in the OnPreInit event:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;protected override void OnPreInit(EventArgs e)
+{
+    base.OnPreInit(e);
+
+    var contentLoader = ServiceLocator.Current.GetInstance&amp;lt;IContentLoader&amp;gt;();
+    var startPage = contentLoader.Get&amp;lt;StartPage&amp;gt;(ContentReference.StartPage);
+
+    if (!PageEditing.PageIsInEditMode &amp;amp;&amp;amp; !ContentReference.IsNullOrEmpty(startPage.NotFoundPage))
+    {
+        this.CurrentPageLink = startPage.NotFoundPage;
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;Voila! Now we have a working 404 page, where an editor can change the content of the page. There’s only one caveat, what happens if the website is globalized and we have more than one language? We need to load the 404 page in the correct language of course. This is a bit trickier and this is the best solution I came up with. Please let me know if there is a better way of doing this. In the code-behind of the template we just override the InitializeCulture event:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;protected override void InitializeCulture()
+{
+    if (!PageEditing.PageIsInEditMode)
+    {
+        // Try to find the language id from the actual requested url
+        var segments = Request.RawUrl.Split('/');
+        var languageSegment = segments.Length &amp;gt; 1 ? segments[1] : string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(languageSegment))
+        {
+            var languageMatcher = ServiceLocator.Current.GetInstance&amp;lt;ILanguageSegmentMatcher&amp;gt;();
+
+            var languageId = string.Empty;
+
+            if (languageMatcher.TryGetLanguageId(languageSegment, out languageId))
+            {
+                var currentLanguage = ServiceLocator.Current.GetInstance&amp;lt;IUpdateCurrentLanguage&amp;gt;();
+
+                // Update the language, if language id was found
+                currentLanguage.UpdateLanguage(languageId);
+            }
+        }
+    }
+
+    base.InitializeCulture();
+}&lt;/pre&gt;
+
+&lt;p&gt;We’re parsing out the first segment of the requested url, then we’re trying to match that segment with all available language versions of the page, including fallback settings. The correct language will be loaded automatically, if we have a domain for the language and not a segment in the url, but that’s not always the case.&lt;/p&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

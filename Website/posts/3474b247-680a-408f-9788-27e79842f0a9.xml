@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Add support for container pages by marking content types with an interface</title>
+  <slug>add-support-for-container-pages-by-marking-content-types-with-an-interface</slug>
+  <author></author>
+  <pubDate>2014-10-21 22:59:02</pubDate>
+  <lastModified>2014-10-21 22:59:02</lastModified>
+  <content>&lt;p&gt;First of all, &lt;a href="http://tech-fellow.net/2014/01/31/add-support-container-pages-episerver-7-5/"&gt;this is not a new concept&lt;/a&gt; but the API has changed since EPiServer 7.14. IUIDescriptorInitializer is now obsolete. So here’s my take on this.&lt;/p&gt;  &lt;p&gt;First we need an interface to “mark” the content types with: &lt;/p&gt;  &lt;pre class="prettyprint"&gt;namespace DV
+{
+    /// &amp;lt;summary&amp;gt;
+    /// Interface to mark content types as container pages, i.e. changing the icon
+    /// in the page tree and defaulting to All Properties view.
+    /// &amp;lt;/summary&amp;gt;
+    public interface IContainerPage
+    {
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;Then we need a function to get all types that is marked with this interface, this is a &lt;a href="http://tech-fellow.net/2014/01/31/add-support-container-pages-episerver-7-5/"&gt;straight copy of Valdis code&lt;/a&gt; but I wanted to include it in my post as well to avoid a possible dead link in the future:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;namespace DV
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
+    /// &amp;lt;summary&amp;gt;
+    /// Helper functions for working with types.
+    /// &amp;lt;/summary&amp;gt;
+    public static class TypeFunctions
+    {
+        /// &amp;lt;summary&amp;gt;
+        /// Get all types that implements or is a subclass of the specified type.
+        /// &amp;lt;/summary&amp;gt;
+        /// &amp;lt;typeparam name=&amp;quot;T&amp;quot;&amp;gt;The type of the superclass.&amp;lt;/typeparam&amp;gt;
+        /// &amp;lt;returns&amp;gt;Returns a list of types that implements or is a subclass of the specified type.&amp;lt;/returns&amp;gt;
+        public static IEnumerable&amp;lt;Type&amp;gt; GetTypesChildOf&amp;lt;T&amp;gt;()
+        {
+            var types = new List&amp;lt;Type&amp;gt;();
+
+            foreach (var assembly in TypeFunctions.GetAssemblies())
+            {
+                types.AddRange(TypeFunctions.GetTypesChildOfInAssembly(typeof(T), assembly));
+            }
+
+            return types;
+        }
+
+        private static IEnumerable&amp;lt;Assembly&amp;gt; GetAssemblies()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies();
+        }
+
+        private static IEnumerable&amp;lt;Type&amp;gt; GetTypesChildOfInAssembly(Type type, Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes().Where(t =&amp;gt; type.IsAssignableFrom(t) &amp;amp;&amp;amp; t.IsClass);
+            }
+            catch (Exception)
+            {
+                // there could be situations when type could not be loaded
+                // this may happen if we are visiting *all* loaded assemblies in application domain
+                return Enumerable.Empty&amp;lt;Type&amp;gt;();
+            }
+        }
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;Then we only need an initializable module that iterates through all UI descriptors, finds the ones that are marked with the IContainerPage interface and then finally set the default view and icon class.&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;namespace DV
+{
+    using System;
+    using System.Linq;
+    using EPiServer.Framework;
+    using EPiServer.Framework.Initialization;
+    using EPiServer.Shell;
+    using EPiServer.ServiceLocation;
+
+    [InitializableModule]
+    [ModuleDependency(typeof(EPiServer.Web.InitializationModule))]
+    public class ContainerPageUIDescriptorInitialization : IInitializableModule
+    {
+        public void Initialize(InitializationEngine context)
+        {
+            var containerTypes = TypeFunctions.GetTypesChildOf&amp;lt;IContainerPage&amp;gt;();
+            var registry = ServiceLocator.Current.GetInstance&amp;lt;UIDescriptorRegistry&amp;gt;();
+            var containerDescriptors = registry.UIDescriptors.Where(d =&amp;gt; containerTypes.Contains(d.ForType));
+
+            foreach (var descriptor in containerDescriptors)
+            {
+                descriptor.DefaultView = CmsViewNames.AllPropertiesView;
+                descriptor.IconClass = ContentTypeCssClassNames.Container;
+            }
+        }
+
+        public void Preload(string[] parameters) { }
+
+        public void Uninitialize(InitializationEngine context)
+        {
+            // Do nothing.
+        }
+    }
+}&lt;/pre&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

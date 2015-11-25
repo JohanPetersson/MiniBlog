@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>How to prevent a link from being rewritten</title>
+  <slug>how-to-prevent-a-link-from-being-rewritten</slug>
+  <author></author>
+  <pubDate>2014-02-13 23:55:10</pubDate>
+  <lastModified>2014-02-13 23:55:10</lastModified>
+  <content>&lt;p&gt;I was using a regular EPiServer template to generate an email template, which an email service could download and send to subscribers. The template had some dynamic links, e.g. unsubscribe and preferences links. These are defined with tokens in the markup and are replaced when the email is sent by the service. The unsubscribe link looks like:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;&amp;lt;a href=&amp;quot;%UNSUBSCRIBELINK%&amp;quot;&amp;gt;Unsubscribe&amp;lt;/a&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;Unfortunately this links gets rewritten by the URL rewriter and/or html parser that the rewriter is using. &lt;/p&gt;
+
+&lt;p&gt;I was trying to exclude the links and the template in Global by adding them in:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;UrlRewriteProvider.AddExcludedPath() &lt;/pre&gt;
+
+&lt;p&gt;That did however not work. The links were always rendered like:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;a href=&amp;quot;/path/to/template/%UNSUBSCRIBELINK%&amp;quot;&amp;gt;Unsubscribe&amp;lt;/a&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;Thanks to &lt;a href="http://world.episerver.com/System/Users-and-profiles/Community-Profile-Card/?encryptedcurrentid=uMpWEG3NRV8%3d"&gt;Tobias&lt;/a&gt; and an old &lt;a href="http://labs.kaliko.com/2010/11/prevent-episerver-urlrewrite.html"&gt;blog post&lt;/a&gt;, we found a workaround. You can add an attribute to the link which stops the rewriter from touching the link. The &lt;strong&gt;important&lt;/strong&gt; part here, besides the attribute, is to add an &lt;strong&gt;id&lt;/strong&gt; to the element as well(!).&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;a href=&amp;quot;%UNSUBSCRIBELINK%&amp;quot; &amp;lt;%= EPiServer.Web.UrlRewriteProvider.UrlPreventRewriteAttribute %&amp;gt;=&amp;quot;true&amp;quot; id=&amp;quot;required-id-but-not-used&amp;quot;&amp;gt;Unsubscribe&amp;lt;/a&amp;gt;&lt;/pre&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

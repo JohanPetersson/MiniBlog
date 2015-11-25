@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>How to inject a script for just one block?</title>
+  <slug>how-to-inject-a-script-for-a-block</slug>
+  <author></author>
+  <pubDate>2015-02-04 19:54:59</pubDate>
+  <lastModified>2015-02-05 17:06:49</lastModified>
+  <excerpt></excerpt>
+  <content>&lt;p&gt;The answer is very simple, but first your template(s) must meet these &lt;a href="http://world.episerver.com/documentation/Items/Developers-Guide/EPiServer-CMS/75/Client-resources/Client-resources/"&gt;client resource requirements&lt;/a&gt;. The article mention how to register a script on a page level, and in this case it will be injected on ALL templates that meet the requirements, i.e. page type name is XFormPage.&lt;/p&gt;&lt;p&gt;But let’s say you just want to inject a script if a specific block is used on the page. One solution is to use the method in the article and then iterate through all blocks in the page’s content areas and see if the block is used. Probably not the smartest and fastest solution.&lt;/p&gt;&lt;p&gt;A more simple solution is to require the script in the block’s view or in your controller:&lt;/p&gt;&lt;pre class="prettyprint"&gt;var clientResources = ServiceLocator.Current.GetInstance&amp;lt;IRequiredClientResourceList&amp;gt;();
+
+clientResources.RequireScript("/scripts/my-block-script.js", "MyScript", new[] { "MainScripts" }).AtFooter();&lt;/pre&gt;&lt;p&gt;If the script doesn't have any dependencies, you can pass &lt;code&gt;Enumerable.Empty&amp;lt;string&amp;gt;()&lt;/code&gt; instead of &lt;code&gt;new[] { "MainScripts" }&lt;/code&gt;.&lt;/p&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

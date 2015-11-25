@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>How to handle links in blocks and pages, that should wrap content</title>
+  <slug>how-to-handle-links-in-blocks</slug>
+  <author></author>
+  <pubDate>2014-02-27 05:25:12</pubDate>
+  <lastModified>2014-02-27 05:25:12</lastModified>
+  <content>&lt;p&gt;First off, there is a similar solution already in the Alloy templates. But this one is a bit more refined.&lt;/p&gt;  &lt;p&gt;So the problem. Lets say you have a block that represents a teaser, the teaser has a tagline, heading, image and link. When the editor has specified a link, the tagline and heading should be wrapped with the link, otherwise they should be wrapped with a div. Something like this:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;&amp;lt;div class=&amp;quot;teaser&amp;quot;&amp;gt;
+	&amp;lt;div class=&amp;quot;image-wrapper&amp;quot;&amp;gt;
+		&amp;lt;img src=&amp;quot;/image.jpg&amp;quot; alt=&amp;quot;&amp;quot; /&amp;gt;
+	&amp;lt;/div&amp;gt;
+	&amp;lt;a class=&amp;quot;content-wrapper&amp;quot; href=&amp;quot;/about-us/&amp;quot;&amp;gt;
+		&amp;lt;p&amp;gt;Tagline&amp;lt;/p&amp;gt;
+		&amp;lt;h2&amp;gt;Heading&amp;lt;/h2&amp;gt;
+	&amp;lt;/a&amp;gt;
+&amp;lt;/div&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;And without a link:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;div class=&amp;quot;teaser&amp;quot;&amp;gt;
+	&amp;lt;div class=&amp;quot;image-wrapper&amp;quot;&amp;gt;
+		&amp;lt;img src=&amp;quot;/image.jpg&amp;quot; alt=&amp;quot;&amp;quot; /&amp;gt;
+	&amp;lt;/div&amp;gt;
+	&amp;lt;div class=&amp;quot;content-wrapper&amp;quot;&amp;gt;
+		&amp;lt;p&amp;gt;Tagline&amp;lt;/p&amp;gt;
+		&amp;lt;h2&amp;gt;Heading&amp;lt;/h2&amp;gt;
+	&amp;lt;/div&amp;gt;
+&amp;lt;/div&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;There is also the case when the teaser should be edited, the link can cause problems for the editors and it’s best to replace it then as well.&lt;/p&gt;
+
+&lt;p&gt;This can be solved with a lot of if-statements in the markup and check if the link is null and/or you’re in edit mode, maybe in a combination with placeholder controls with the markup that should be toggled. It will get messy though. Something like this:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;div class=&amp;quot;teaser&amp;quot;&amp;gt;
+	&amp;lt;div class=&amp;quot;image-wrapper&amp;quot;&amp;gt;
+		&amp;lt;EPiServer:Property runat=&amp;quot;server&amp;quot; PropertyName=&amp;quot;Image&amp;quot; /&amp;gt;
+	&amp;lt;/div&amp;gt;
+	&amp;lt;asp:PlaceHolder runat=&amp;quot;server&amp;quot; Visible=&amp;quot;&amp;lt;%# CurrentBlock.Link != null &amp;amp;&amp;amp; PageEditing.PageIsInEditMode == false %&amp;gt;&amp;quot;&amp;gt;
+		&amp;lt;a class=&amp;quot;content-wrapper&amp;quot; href=&amp;quot;&amp;lt;%= CurrentBlock.Link  %&amp;gt;&amp;quot;&amp;gt;
+	&amp;lt;/asp:PlaceHolder&amp;gt;
+
+	&amp;lt;asp:PlaceHolder runat=&amp;quot;server&amp;quot; Visible=&amp;quot;&amp;lt;%# CurrentBlock.Link == null || PageEditing.PageIsInEditMode %&amp;gt;&amp;quot;&amp;gt;
+		&amp;lt;div class=&amp;quot;content-wrapper&amp;quot;&amp;gt;
+	&amp;lt;/asp:PlaceHolder&amp;gt;
+
+		&amp;lt;EPiServer:Property runat=&amp;quot;server&amp;quot; PropertyName=&amp;quot;Tagline&amp;quot; CustomTagName=&amp;quot;p&amp;quot; /&amp;gt;
+		&amp;lt;EPiServer:Property runat=&amp;quot;server&amp;quot; PropertyName=&amp;quot;Heading&amp;quot; CustomTagName=&amp;quot;h2&amp;quot; /&amp;gt;
+
+	&amp;lt;asp:PlaceHolder runat=&amp;quot;server&amp;quot; Visible=&amp;quot;&amp;lt;%# CurrentBlock.Link == null || PageEditing.PageIsInEditMode %&amp;gt;&amp;quot;&amp;gt;
+		&amp;lt;/div&amp;gt;
+	&amp;lt;/asp:PlaceHolder&amp;gt;
+
+	&amp;lt;asp:PlaceHolder runat=&amp;quot;server&amp;quot; Visible=&amp;quot;&amp;lt;%# CurrentBlock.Link != null &amp;amp;&amp;amp; PageEditing.PageIsInEditMode == false %&amp;gt;&amp;quot;&amp;gt;
+		&amp;lt;/a&amp;gt;
+	&amp;lt;/asp:PlaceHolder&amp;gt;
+&amp;lt;/div&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;Instead we can create a web control that handles this. We can then use this web control to wrap the content. If we have specified a tag name in &lt;strong&gt;CustomTagName&lt;/strong&gt;, this tag will be rendered instead of the link if the link is null or we’re in edit mode, otherwise no tag will be rendered.&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;namespace DV.Controls
+{
+    using EPiServer;
+    using EPiServer.Editor;
+    using System;
+    using System.Web.UI;
+    using System.Web.UI.WebControls;
+
+    /// &amp;lt;summary&amp;gt;
+    /// A web control that renders a hyperlink when not in edit mode and the specified url is not null.
+    /// If in edit mode or the url is null, a tag of the type specified in CustomTageName is rendered instead.
+    /// If no tag is specified in CustomTageName, no tag is rendered at all.
+    /// &amp;lt;/summary&amp;gt;
+    [ParseChildren(false)]
+    [PersistChildren(true)]
+    public class ToggleLink : WebControl
+    {
+        public Url Url { get; set; }
+
+        public string CustomTagName { get; set; }
+
+        private bool RenderCustomTag
+        {
+            get
+            {
+                return PageEditing.PageIsInEditMode || this.Url == null;
+            }
+        }
+
+        protected override HtmlTextWriterTag TagKey
+        {
+            get
+            {
+                if (this.RenderCustomTag)
+                {
+                    if (string.IsNullOrEmpty(this.CustomTagName))
+                    {
+                        return HtmlTextWriterTag.Unknown;
+                    }
+                    else
+                    {
+                        return (HtmlTextWriterTag)Enum.Parse(
+                            typeof(HtmlTextWriterTag),
+                            this.CustomTagName,
+                            true);
+                    }
+                }
+
+                return HtmlTextWriterTag.A;
+            }
+        }
+
+        protected override void AddAttributesToRender(HtmlTextWriter writer)
+        {
+            base.AddAttributesToRender(writer);
+
+            if (this.TagKey == HtmlTextWriterTag.A)
+            {
+                writer.AddAttribute(HtmlTextWriterAttribute.Href, this.Url.ToString());
+            }
+        }
+
+        public override void RenderBeginTag(HtmlTextWriter writer)
+        {
+            if (this.RenderCustomTag &amp;amp;&amp;amp;
+                this.TagKey == HtmlTextWriterTag.Unknown)
+            {
+                return;
+            }
+
+            base.RenderBeginTag(writer);
+        }
+
+        public override void RenderEndTag(HtmlTextWriter writer)
+        {
+            if (this.RenderCustomTag &amp;amp;&amp;amp;
+                this.TagKey == HtmlTextWriterTag.Unknown)
+            {
+                return;
+            }
+
+            base.RenderEndTag(writer);
+        }
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;Now we can write like this instead:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;div class=&amp;quot;teaser&amp;quot;&amp;gt;
+	&amp;lt;div class=&amp;quot;image-wrapper&amp;quot;&amp;gt;
+		&amp;lt;EPiServer:Property runat=&amp;quot;server&amp;quot; PropertyName=&amp;quot;Image&amp;quot; /&amp;gt;
+	&amp;lt;/div&amp;gt;
+	&amp;lt;DV:ToggleLink Url=&amp;quot;&amp;lt;%# CurrentBlock.Link %&amp;gt;&amp;quot; CustomTagName=&amp;quot;div&amp;quot; CssClass=&amp;quot;content-wrapper&amp;quot; runat=&amp;quot;server&amp;quot;&amp;gt;
+		&amp;lt;EPiServer:Property runat=&amp;quot;server&amp;quot; PropertyName=&amp;quot;Tagline&amp;quot; CustomTagName=&amp;quot;p&amp;quot; /&amp;gt;
+		&amp;lt;EPiServer:Property runat=&amp;quot;server&amp;quot; PropertyName=&amp;quot;Heading&amp;quot; CustomTagName=&amp;quot;h2&amp;quot; /&amp;gt;
+	&amp;lt;/DV:ToggleLink&amp;gt;
+&amp;lt;/div&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;Much nicer code, if you ask me.&lt;/p&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

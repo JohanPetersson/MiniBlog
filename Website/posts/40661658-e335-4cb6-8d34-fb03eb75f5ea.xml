@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Permanent link handling pt. II</title>
+  <slug>permanent-link-handling-pt-ii</slug>
+  <author></author>
+  <pubDate>2014-01-23 01:02:46</pubDate>
+  <lastModified>2014-01-23 01:02:46</lastModified>
+  <content>&lt;p&gt;Alright, so it turns out EPiServer 7 (and later versions) already has a route for permanent links. It was slightly different from the one I created, so here’s an updated version of the extension method:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;public static string PermanentLink(this PageData page)
+{
+    var url = new UriBuilder(Settings.Instance.SiteUrl);
+
+    var languageBranch = ServiceLocator.Current.GetInstance&amp;lt;ILanguageBranchRepository&amp;gt;()
+        .Load(page.Language);
+
+    url.Path = string.Format(&amp;quot;/{0}/link/{1}&amp;quot;,
+        languageBranch.CurrentUrlSegment,
+        page.ContentGuid.ToString(&amp;quot;N&amp;quot;));
+
+    return url.Uri.AbsoluteUri;
+}&lt;/pre&gt;
+
+&lt;p&gt;So no need to register your own route.&lt;/p&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

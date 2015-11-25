@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Permanent link handling</title>
+  <slug>permanent-link-handling</slug>
+  <author></author>
+  <pubDate>2014-01-23 01:01:36</pubDate>
+  <lastModified>2014-01-23 01:01:36</lastModified>
+  <content>&lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; If you’re using EPiServer 7 (or later version), please &lt;a href="/post/permanent-link-handling-pt-ii"&gt;see my updated post&lt;/a&gt;!&lt;/p&gt;  &lt;p&gt;If you move a page in the page tree, the url to the page will change. There are numerous available solutions to handle this, e.g. by saving the old url and set up a re-direction to the new url.&lt;/p&gt;  &lt;p&gt;In some cases we’re sending emails with the url in the message, but what happens if we change the url to the page after the email is sent? In this case we could send a permanent link instead, that never change, even when the page is moved. This is also useful when using commenting systems from 3rd parties, like Facebook, where the comments are tied to the url of the page.&lt;/p&gt;  &lt;p&gt;First we need a way to create the urls, in this case we’re just using an extension method:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;public static string PermanentLink(this PageData page)
+{
+    var url = new UriBuilder(Settings.Instance.SiteUrl);
+
+    url.Path = string.Format(&amp;quot;/permanentlink/{0}&amp;quot;, page.ContentGuid);
+
+    return url.Uri.AbsoluteUri;
+}&lt;/pre&gt;
+
+&lt;p&gt;The generated link will look like http://dodavinkeln.se/permanentlink/263581a1-6575-4938-b558-e871a1864f66.&lt;/p&gt;
+
+&lt;p&gt;Then we need a handler that maps this url to the page again. In this case we’re going to create a &lt;strong&gt;Http Handler&lt;/strong&gt;, unfortunately you can’t create a route to a Http Handler, so we also need to create a &lt;strong&gt;Route Handler&lt;/strong&gt; and then return our Http Handler.&lt;/p&gt;
+
+&lt;p&gt;The Http Handler gets the incoming page guid from the &lt;strong&gt;Route Data&lt;/strong&gt;, then we map the guid to a Page Reference and finally fetch the page and do a re-direct. ExternalUrl() is an extension method that returns the friendly url to the page, which is not covered in this post.&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;namespace DV.HttpHandlers
+{
+    using EPiServer;
+    using EPiServer.Core;
+    using EPiServer.ServiceLocation;
+    using EPiServer.Web;
+    using System;
+    using System.Web;
+    using System.Web.Routing;
+
+    public class PermanentLinkRouteHandler : IRouteHandler
+    {
+        public IHttpHandler GetHttpHandler(RequestContext requestContext)
+        {
+            return new PermanentLinkHttpHandler();
+        }
+    }
+
+    public class PermanentLinkHttpHandler : IHttpHandler
+    {
+        public void ProcessRequest(HttpContext context)
+        {
+            Guid guid;
+
+            if (Guid.TryParse((string)context.Request.RequestContext.RouteData.Values[&amp;quot;guid&amp;quot;], out guid))
+            {
+                var linkMap = PermanentLinkMapStore.Find(guid, PermanentLinkMapStore.StorePreference.Page) as PermanentContentLinkMap;
+
+                if (linkMap != null)
+                {
+                    var repo = ServiceLocator.Current.GetInstance&amp;lt;IContentRepository&amp;gt;();
+
+                    try
+                    {
+                        var page = repo.Get&amp;lt;PageData&amp;gt;(linkMap.ContentReference);
+
+                        context.Response.RedirectPermanent(page.ExternalUrl(false));
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+            }
+
+            context.Response.Status = &amp;quot;404 Not Found&amp;quot;;
+            context.Response.StatusCode = 404;
+        }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
+        }
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;We also need to register the route, we can do this in an &lt;strong&gt;Initializable Module&lt;/strong&gt; or on application start in &lt;strong&gt;Global&lt;/strong&gt;. In this case we’re doing it in the application start event:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;namespace DV
+{
+    using System;
+    using System.Web.Routing;
+    using DV.HttpHandlers;
+
+    public class Global : EPiServer.Global
+    {
+        protected void Application_Start(object sender, EventArgs e)
+        {
+            RouteTable.Routes.Add(new Route(&amp;quot;permanentlink/{guid}&amp;quot;, new PermanentLinkRouteHandler()));
+        }
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;We could extend the links to handle language and other parameters as well. But I leave that to you.&lt;/p&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>
