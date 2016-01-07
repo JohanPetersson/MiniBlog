@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Make PropertyFor() more consistent</title>
+  <slug>make-propertyfor()-more-consistent</slug>
+  <author></author>
+  <pubDate>2016-01-07 18:47:00</pubDate>
+  <lastModified>2016-01-07 19:29:35</lastModified>
+  <excerpt></excerpt>
+  <content>&lt;p&gt;Coming from WebForms development I was a bit annoyed with the inconsistent behavior of the &lt;code&gt;PropertyFor()&lt;/code&gt; Html Helper. In WebForms properties are always wrapped with an element, but in MVC this is only true in edit mode. Please see &lt;a href="http://joelabrahamsson.com/how-episervers-html-helper-propertyfor-works/"&gt;Joels excelent post about &lt;code&gt;PropertyFor()&lt;/code&gt;&lt;/a&gt; and what gets actually rendered to the client.&lt;/p&gt;  &lt;blockquote&gt;   &lt;p&gt;&lt;strong&gt;Conclusion:&lt;/strong&gt; Properties always gets wrapped with an element in edit mode, but never in view mode. However this is only true for non ContentArea properties, which are not really the problem here.&lt;/p&gt; &lt;/blockquote&gt;  &lt;p&gt;Why is this a problem you might ask? Well this might actually break your design, especially in edit mode where the extra wrapping element might add styling that you don’t want. So how can we fix this?&lt;/p&gt;  &lt;p&gt;One solution is to not use &lt;code&gt;PropertyFor()&lt;/code&gt; at all and instead use &lt;code&gt;DisplayFor()&lt;/code&gt; or just &lt;code&gt;@Model.YourProperty&lt;/code&gt;. But then you need to add the editing attributes manually to a parent element but then that parent will always get rendered in view mode, even though the property doesn’t have a value. You can fix that by adding an if-statement around the parent and the property and then check whether we are in edit mode and/or the property has a value (we always need to render the parent in edit mode). Not so nice, and a lot of unnecessary code and logic in the view:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;@if (EPiServer.Editor.PageEditing.PageIsInEditMode || Model.CurrentPage.PageHeading != null)
+{
+	&amp;lt;h2 @Html.EditAttributes(x =&amp;gt; x.CurrentPage.PageHeading)&amp;gt;
+		@Html.DisplayFor(x =&amp;gt; x.CurrentPage.PageHeading)
+	&amp;lt;/h2&amp;gt;
+}&lt;/pre&gt;
+
+&lt;p&gt;Replacing the &lt;code&gt;PropertyRenderer&lt;/code&gt; was the easist way I found to fix this behavior. Please let me know in the comment section if you have a better way of solving this! It was actually really easy:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;public class SitePropertyRenderer : PropertyRenderer
+{
+    protected override MvcHtmlString GetHtmlForDefaultMode&amp;lt;TModel, TValue&amp;gt;(string propertyName, string templateName, string elementName, string elementCssClass, Func&amp;lt;string, MvcHtmlString&amp;gt; displayForAction)
+    {
+        if (string.IsNullOrEmpty(elementName))
+        {
+            return displayForAction(templateName);
+        }
+
+        var tag = new TagBuilder(elementName);
+
+        if (string.IsNullOrEmpty(elementCssClass) == false)
+        {
+            tag.AddCssClass(elementCssClass);
+        }
+
+        tag.InnerHtml = displayForAction(templateName).ToHtmlString();
+
+        return new MvcHtmlString(tag.ToString());
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;We only have to override&amp;#160; how the property is rendered in view mode and always add the wrapping element. We also need to replace the default renderer in the container with our own, which can be done in an initializable module:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;[InitializableModule]
+public class ContainerConfigurableModule : IConfigurableModule
+{
+    public void ConfigureContainer(ServiceConfigurationContext context)
+    {
+        context.Container.Configure(container =&amp;gt;
+            container.For&amp;lt;PropertyRenderer&amp;gt;().Use&amp;lt;SitePropertyRenderer&amp;gt;());
+    }
+}&lt;/pre&gt;
+
+&lt;p&gt;Now we can write like this in the view instead, and the wrapper gets always rendered, but only in view mode if the property has a value:&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;@Html.PropertyFor(x =&amp;gt; x.CurrentPage.PageHeading, new { CustomTag = &amp;quot;h2&amp;quot; })&lt;/pre&gt;
+
+&lt;p&gt;This will probably not be an issue in MVC 6, hopefully in a near future, where we can use &lt;a href="https://github.com/aspnet/Mvc/tree/dev/src/Microsoft.AspNet.Mvc.TagHelpers"&gt;Tag Helpers&lt;/a&gt; instead.&lt;/p&gt;
+
+&lt;p&gt;I have some more blog post in the pipeline on the same topic; keeping the views and output clean. So stay tuned!&lt;/p&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+    <category>MVC</category>
+  </categories>
+  <comments></comments>
+</post>
