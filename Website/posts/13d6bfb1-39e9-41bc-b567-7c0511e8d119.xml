@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Introducing Episerver Taxonomy</title>
+  <slug>introducing-episerver-taxonomy</slug>
+  <author>johan</author>
+  <pubDate>2016-11-27 16:30:36</pubDate>
+  <lastModified>2016-11-27 16:30:36</lastModified>
+  <excerpt></excerpt>
+  <content>
+		&lt;p&gt;&lt;img src="https://raw.githubusercontent.com/JohanPetersson/episerver-taxonomy/master/taxonomy.png" width="300" class="img-rounded pull-right" alt="Screenshot from Episerver editing UI" /&gt;Since I started working with Episerver back in 2008 I've been missing better taxonomy support, that and a "bucket" feature where we can put content that doesn't fit into a content tree, but in this post I will just cover taxonomy (buckets might be my next challenge though).&lt;/p&gt;
+
+		&lt;p&gt;If you're like me, you've probably always wondered why you need admin access to just administer categories and why it's so cumbersome to translate them. Well, you don't have to anymore! Head over to GitHub and check my new project out at &lt;a href="https://github.com/JohanPetersson/episerver-taxonomy"&gt;https://github.com/JohanPetersson/episerver-taxonomy&lt;/a&gt;.&lt;/p&gt;
+
+		&lt;p&gt;You'll find more information at GitHub, but in short this Add-on gives editors a new UI to manage taxonomy and us, developers, a new way to define different types of taxonomy.&lt;p&gt;
+
+		&lt;p&gt;We can define taxonomy by inheriting from &lt;code&gt;TaxonomyData&lt;/code&gt;:&lt;/p&gt;
+
+		&lt;pre class="prettyprint"&gt;
+using Dodavinkeln.Taxonomy.Core;
+using EPiServer.DataAnnotations;
+
+[ContentType(GUID = "974ebaf3-c6fc-4332-a809-344b7e372f21")]
+public class CategoryData : TaxonomyData
+{
+}&lt;/pre&gt;
+
+		&lt;p&gt;And then add taxonomy properties to content types:&lt;/p&gt;
+
+		&lt;pre class="prettyprint"&gt;
+[Taxonomy]
+[Display(Name = "News category")]
+public virtual ContentReference NewsCategory { get; set; }&lt;/pre&gt;
+
+		&lt;p&gt;The Add-on is not release in a public feed yet, I would like to have some feedback and implement a few more features before releasing 1.0. So please check it out and leave comments here or on GitHub.&lt;/p&gt;
+	</content>
+  <ispublished>true</ispublished>
+	<categories>
+		<category>EPiServer</category>
+	</categories>
+  <comments></comments>
+</post>
