@@ -6,13 +6,32 @@
 		<div>
 			<span class="glyphicon glyphicon-bookmark"></span> Posted in:
 			@Categories()
-			<span class="glyphicon glyphicon-calendar"></span> <abbr title="@Model.PubDate.ToLocalTime()" itemprop="datePublished">@Model.PubDate.ToLocalTime().ToLongDateString()</abbr>
+			<span class="glyphicon glyphicon-calendar"></span> <time datetime="@Model.PubDate.ToString("yyyy'-'MM'-'dd'T'HH:mmK")" itemprop="datePublished">@Model.PubDate.ToLocalTime().ToLongDateString()</time>
 			<span class="glyphicon glyphicon-comment"></span> <a href="@Model.Url#comments" data-disqus-identifier="@Model.ID">Comments</a>
 		</div>
 	</header>
 
 	<div itemprop="articleBody">
 		@Html.Raw(Blog.IsEditing ? Model.Content : Model.GetHtmlContent())
+	</div>
+
+	<div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+		<meta itemprop="url" content="http://dodavinkeln.se/themes/@Blog.Theme/johan.jpg">
+		<meta itemprop="width" content="517">
+		<meta itemprop="height" content="517">
+	</div>
+
+	<div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+		<div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+			<meta itemprop="url" content="http://dodavinkeln.se/themes/@Blog.Theme/johan.jpg">
+			<meta itemprop="width" content="517">
+			<meta itemprop="height" content="517">
+		</div>
+		<meta itemprop="name" content="@Blog.Title">
+	</div>
+
+	<div itemprop="author" itemscope itemtype="https://schema.org/Person">
+		<meta itemprop="name" content="Johan Petersson">
 	</div>
 
 	@if (Blog.CurrentPost != null)

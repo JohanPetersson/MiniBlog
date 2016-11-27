@@ -78,7 +78,7 @@ pre {
         color: #777777;
     }
 
-    .post header div abbr {
+    .post header div time {
         padding-right: 10px;
         border: none;
     }
