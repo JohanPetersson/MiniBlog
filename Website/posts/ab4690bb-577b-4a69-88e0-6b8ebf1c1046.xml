@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Constants for all Episerver icons</title>
+  <slug>constants-for-all-episerver-icons</slug>
+  <author>johan</author>
+  <pubDate>2016-08-31 13:51:42</pubDate>
+  <lastModified>2016-08-31 13:51:58</lastModified>
+  <excerpt></excerpt>
+  <content>&lt;p&gt;I couldn't find constants for all Episerver action icons located here &lt;a href="http://ux.episerver.com/"&gt;http://ux.episerver.com/&lt;/a&gt; anywhere in Episerver or on the Internet. So I thought I would share those with you. These are really useful if you e.g. are using this &lt;a href="http://blog.nansen.com/2014/10/page-tree-icons-in-episerver-cms-75.html"&gt;solution&lt;/a&gt;.&lt;/p&gt;
+  &lt;pre class="prettyprint"&gt;
+public static class ContentIcons
+{
+    public const string Clock = &quot;epi-iconClock&quot;;
+    public const string Checkmark = &quot;epi-iconCheckmark&quot;;
+    public const string Stop = &quot;epi-iconStop&quot;;
+    public const string Versions = &quot;epi-iconVersions&quot;;
+    public const string Revert = &quot;epi-iconRevert&quot;;
+    public const string Undo = &quot;epi-iconUndo&quot;;
+    public const string Redo = &quot;epi-iconRedo&quot;;
+    public const string Pen = &quot;epi-iconPen&quot;;
+    public const string PenDisabled = &quot;epi-iconPenDisabled&quot;;
+    public const string DuplicatePage = &quot;epi-iconDuplicatePage&quot;;
+    public const string Primary = &quot;epi-iconPrimary&quot;;
+    public const string Trash = &quot;epi-iconTrash&quot;;
+    public const string Users = &quot;epi-iconUsers&quot;;
+    public const string Search = &quot;epi-iconSearch&quot;;
+    public const string Plus = &quot;epi-iconPlus&quot;;
+    public const string Minus = &quot;epi-iconMinus&quot;;
+    public const string Star = &quot;epi-iconStar&quot;;
+    public const string Settings = &quot;epi-iconSettings&quot;;
+    public const string Lock = &quot;epi-iconLock&quot;;
+    public const string Pin = &quot;epi-iconPin&quot;;
+    public const string Page = &quot;epi-iconPage&quot;;
+    public const string Folder = &quot;epi-iconFolder&quot;;
+    public const string SharedBlock = &quot;epi-iconSharedBlock&quot;;
+    public const string Up = &quot;epi-iconUp&quot;;
+    public const string Down = &quot;epi-iconDown&quot;;
+    public const string Reload = &quot;epi-iconReload&quot;;
+    public const string Share = &quot;epi-iconShare&quot;;
+    public const string Download = &quot;epi-iconDownload&quot;;
+    public const string DnD = &quot;epi-iconDnD&quot;;
+    public const string ContextMenu = &quot;epi-iconContextMenu&quot;;
+    public const string Rename = &quot;epi-iconRename&quot;;
+    public const string Left = &quot;epi-iconLeft&quot;;
+    public const string Right = &quot;epi-iconRight&quot;;
+    public const string User = &quot;epi-iconUser&quot;;
+    public const string Hidden = &quot;epi-iconHidden&quot;;
+    public const string NewWindow = &quot;epi-iconNewWindow&quot;;
+    public const string Catalog = &quot;epi-iconCatalog&quot;;
+    public const string Category = &quot;epi-iconCategory&quot;;
+    public const string Product = &quot;epi-iconProduct&quot;;
+    public const string SKU = &quot;epi-iconSKU&quot;;
+    public const string Package = &quot;epi-iconPackage&quot;;
+    public const string Bundle = &quot;epi-iconBundle&quot;;
+    public const string Boxes = &quot;epi-iconBoxes&quot;;
+    public const string References = &quot;epi-iconReferences&quot;;
+    public const string Bubble = &quot;epi-iconBubble&quot;;
+    public const string Location = &quot;epi-iconLocation&quot;;
+    public const string Mail = &quot;epi-iconMail&quot;;
+    public const string Telephone = &quot;epi-iconTelephone&quot;;
+    public const string Website = &quot;epi-iconWebsite&quot;;
+    public const string Link = &quot;epi-iconLink&quot;;
+    public const string Upload = &quot;epi-iconUpload&quot;;
+    public const string Error = &quot;epi-iconError&quot;;
+    public const string Warning = &quot;epi-iconWarning&quot;;
+    public const string Info = &quot;epi-iconInfo&quot;;
+    public const string Pricing = &quot;epi-iconPricing&quot;;
+    public const string Cut = &quot;epi-iconCut&quot;;
+    public const string Copy = &quot;epi-iconCopy&quot;;
+    public const string Paste = &quot;epi-iconPaste&quot;;
+    public const string Detach = &quot;epi-iconDetach&quot;;
+    public const string List = &quot;epi-iconList&quot;;
+    public const string Thumbnails = &quot;epi-iconThumbnails&quot;;
+    public const string Tiles = &quot;epi-iconTiles&quot;;
+    public const string Project = &quot;epi-iconProject&quot;;
+    public const string Published = &quot;epi-iconPublished&quot;;
+    public const string PreviouslyPublished = &quot;epi-iconPreviouslyPublished&quot;;
+    public const string Truck = &quot;epi-iconTruck&quot;;
+    public const string Cart = &quot;epi-iconCart&quot;;
+    public const string Sort = &quot;epi-iconSort&quot;;
+    public const string Campaign = &quot;epi-iconCampaign&quot;;
+    public const string PublishProject = &quot;epi-iconPublishProject&quot;;
+    public const string Promotion = &quot;epi-iconPromotion&quot;;
+    public const string Layout = &quot;epi-iconLayout&quot;;
+    public const string SortAscending = &quot;epi-iconSortAscending&quot;;
+    public const string SortDescending = &quot;epi-iconSortDescending&quot;;
+    public const string Edited = &quot;epi-iconEdited&quot;;
+    public const string Bell = &quot;epi-iconBell&quot;;
+}
+
+  &lt;/pre&gt;
+  
+  </content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

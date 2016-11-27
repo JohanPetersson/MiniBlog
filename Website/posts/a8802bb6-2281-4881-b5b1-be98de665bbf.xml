@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>PropertyFor() revisited</title>
+  <slug>propertyfor()-revisited</slug>
+  <author></author>
+  <pubDate>2016-01-13 20:08:43</pubDate>
+  <lastModified>2016-01-13 20:08:43</lastModified>
+  <excerpt></excerpt>
+  <content>&lt;p&gt;Since my &lt;a href="/post/make-propertyfor()-more-consistent"&gt;last post&lt;/a&gt; I’ve discovered a few issues/bugs with my approach while making rendering of properties more consistent. Unfortunately my method didn’t work that well in preview mode and Content Area properties got wrapped twice!&lt;/p&gt;  &lt;p&gt;I couldn’t find an easy way since there is no method to override when properties are rendered in preview mode (these are rendered inside &lt;code&gt;GetHtmlForEditMode()&lt;/code&gt;) and no way of telling if the property is a Content Area inside &lt;code&gt;GetHtmlForDefaultMode()&lt;/code&gt;. So instead I had to override the &lt;code&gt;PropertyFor()&lt;/code&gt; method which made the code much overly complicated and I also had to reflect some private methods from the default PropertyRenderer.&lt;/p&gt;  &lt;p&gt;Here is the new complete code:&lt;/p&gt;  &lt;pre class="prettyprint"&gt;/// &amp;lt;summary&amp;gt;
+///     Overrides the default renderer of all properties, so if we specify a CustomTag(Name) and optionally CssClass they get
+///     rendered in view and preview mode as well. The default renderer only wraps the property in edit mode, except for
+///     content areas which are always wrapped.
+/// &amp;lt;/summary&amp;gt;
+public class SitePropertyRenderer : PropertyRenderer
+{
+    private readonly CachingViewEnginesWrapper viewResolver;
+
+    public SitePropertyRenderer(CachingViewEnginesWrapper viewResolver)
+    {
+        this.viewResolver = viewResolver;
+    }
+
+    public override MvcHtmlString PropertyFor&amp;lt;TModel, TValue&amp;gt;(HtmlHelper&amp;lt;TModel&amp;gt; html, string viewModelPropertyName, object additionalViewData, object editorSettings, Expression&amp;lt;Func&amp;lt;TModel, TValue&amp;gt;&amp;gt; expression, Func&amp;lt;string, MvcHtmlString&amp;gt; displayForAction)
+    {
+        var contextMode = html.ViewContext.RequestContext.GetContextMode();
+
+        // Properties are always wrapped in edit mode, so no need for custom rendering
+        if (contextMode == ContextMode.Edit)
+        {
+            return base.PropertyFor(html, viewModelPropertyName, additionalViewData, editorSettings, expression, displayForAction);
+        }
+
+        var routeValueDictionaries = new RouteValueDictionary(additionalViewData);
+        var templateName = this.ResolveTemplateName(html, routeValueDictionaries, expression);
+        var isContentArea = this.PropertyIsContentArea(html, expression);
+
+        // Content areas are always wrapped, so no need for custom rendering in view mode.
+        if (isContentArea)
+        {
+            return displayForAction(templateName);
+        }
+
+        string elementName = null;
+
+        if (routeValueDictionaries.ContainsKey(&amp;quot;CustomTag&amp;quot;))
+        {
+            elementName = routeValueDictionaries[&amp;quot;CustomTag&amp;quot;] as string;
+        }
+
+        // Correctly spelled property as well, since Episerver probably made a mistake here
+        if (routeValueDictionaries.ContainsKey(&amp;quot;CustomTagName&amp;quot;))
+        {
+            elementName = routeValueDictionaries[&amp;quot;CustomTagName&amp;quot;] as string;
+        }
+
+        string cssClass = null;
+
+        if (routeValueDictionaries.ContainsKey(&amp;quot;CssClass&amp;quot;))
+        {
+            cssClass = routeValueDictionaries[&amp;quot;CssClass&amp;quot;] as string;
+        }
+
+        return this.GetHtmlForDefaultAndPreviewMode(templateName, elementName, cssClass, displayForAction);
+    }
+
+    private MvcHtmlString GetHtmlForDefaultAndPreviewMode(string templateName, string elementName, string cssClass, Func&amp;lt;string, MvcHtmlString&amp;gt; displayForAction)
+    {
+        // Rely on standard behavior if no element is specified
+        if (string.IsNullOrEmpty(elementName))
+        {
+            return displayForAction(templateName);
+        }
+
+        var html = displayForAction(templateName).ToHtmlString();
+
+        if (string.IsNullOrEmpty(html))
+        {
+            return MvcHtmlString.Empty;
+        }
+
+        var tag = new TagBuilder(elementName)
+        {
+            InnerHtml = html
+        };
+
+        if (string.IsNullOrEmpty(cssClass) == false)
+        {
+            tag.AddCssClass(cssClass);
+        }
+
+        return new MvcHtmlString(tag.ToString());
+    }
+
+    private bool PropertyIsContentArea&amp;lt;TModel, TValue&amp;gt;(HtmlHelper&amp;lt;TModel&amp;gt; html, Expression&amp;lt;Func&amp;lt;TModel, TValue&amp;gt;&amp;gt; expression)
+    {
+        var contentAreaType = typeof(ContentArea);
+        var modelMetadata = ModelMetadata.FromLambdaExpression(expression, html.ViewData);
+
+        return contentAreaType.IsAssignableFrom(modelMetadata.ModelType);
+    }
+
+    #region Private methods reflected from base class
+
+    private string ResolveTemplateName&amp;lt;TModel, TValue&amp;gt;(HtmlHelper&amp;lt;TModel&amp;gt; html, RouteValueDictionary additionalValues, Expression&amp;lt;Func&amp;lt;TModel, TValue&amp;gt;&amp;gt; expression)
+    {
+        var modelMetadata = ModelMetadata.FromLambdaExpression(expression, html.ViewData);
+
+        var tag = additionalValues[&amp;quot;tag&amp;quot;] as string;
+
+        if (string.IsNullOrEmpty(tag) &amp;amp;&amp;amp; modelMetadata != null)
+        {
+            tag = this.GetTagFromModelMetadata(modelMetadata);
+        }
+
+        if (string.IsNullOrEmpty(tag) == false &amp;amp;&amp;amp; modelMetadata != null)
+        {
+            var templateResolver = html.ViewData[&amp;quot;templateResolver&amp;quot;] as TemplateResolver ?? ServiceLocator.Current.GetInstance&amp;lt;TemplateResolver&amp;gt;();
+
+            var templateModel = templateResolver.Resolve(
+                html.ViewContext.HttpContext,
+                modelMetadata.ModelType,
+                modelMetadata.Model,
+                TemplateTypeCategories.MvcPartialView,
+                tag);
+
+            var templateName = this.GetTemplateName(templateModel, html.ViewContext);
+
+            if (string.IsNullOrEmpty(templateName) == false)
+            {
+                return templateName;
+            }
+        }
+
+        if (this.DisplayTemplateWithNameExists(html.ViewContext, tag) == false)
+        {
+            return null;
+        }
+
+        return tag;
+    }
+
+    private string GetTagFromModelMetadata(ModelMetadata metaData)
+    {
+        if (metaData == null || metaData.ContainerType == null)
+        {
+            return null;
+        }
+
+        var property = metaData.ContainerType.GetProperty(metaData.PropertyName);
+
+        if (property != null)
+        {
+            var uIHintAttributes = property.GetCustomAttributes(true).OfType&amp;lt;UIHintAttribute&amp;gt;();
+
+            var uIHintAttribute = uIHintAttributes.FirstOrDefault(a =&amp;gt; string.Equals(a.PresentationLayer, &amp;quot;website&amp;quot;, StringComparison.OrdinalIgnoreCase));
+
+            if (uIHintAttribute != null)
+            {
+                return uIHintAttribute.UIHint;
+            }
+
+            uIHintAttribute = uIHintAttributes.FirstOrDefault(a =&amp;gt; string.IsNullOrEmpty(a.PresentationLayer));
+
+            if (uIHintAttribute != null)
+            {
+                return uIHintAttribute.UIHint;
+            }
+        }
+
+        return null;
+    }
+
+    private string GetTemplateName(TemplateModel templateModel, ControllerContext viewContext)
+    {
+        if (templateModel == null)
+        {
+            return null;
+        }
+
+        if (this.DisplayTemplateWithNameExists(viewContext, templateModel.Name) == false)
+        {
+            return null;
+        }
+
+        return templateModel.Name;
+    }
+
+    private bool DisplayTemplateWithNameExists(ControllerContext viewContext, string templateName)
+    {
+        if (string.IsNullOrEmpty(templateName))
+        {
+            return false;
+        }
+
+        var viewEngineResult = this.viewResolver.FindPartialView(viewContext, $&amp;quot;DisplayTemplates/{templateName}&amp;quot;);
+
+        if (viewEngineResult == null)
+        {
+            return false;
+        }
+
+        return viewEngineResult.View != null;
+    }
+
+    #endregion
+}&lt;/pre&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>MVC</category>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

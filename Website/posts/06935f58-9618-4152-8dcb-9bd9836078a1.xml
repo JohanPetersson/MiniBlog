@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>User picker property</title>
+  <slug>user-picker-property</slug>
+  <author>johan</author>
+  <pubDate>2016-10-13 16:29:47</pubDate>
+  <lastModified>2016-10-13 16:47:06</lastModified>
+  <excerpt></excerpt>
+  <content>&lt;p&gt;Lets say you want to give your editors the possibility to select a user (username) in a property so we can display e.g. a byline in an article. The simple solution is to just add a string property to your page type, but then the editor need to enter the username manually. Instead we can use the &lt;a href=&quot;http://world.episerver.com/Blogs/Linus-Ekstrom/Dates/2014/7/Built-in-auto-suggestion-editor/&quot;&gt;AutoSuggestSelection&lt;/a&gt; attribute, then we only need to implement an &lt;code&gt;ISelectionQuery&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Fortunately there is an API in Episerver we can use to query for users, &lt;code&gt;IQueryableNotificationUsers&lt;/code&gt;, but keep in mind that the API is internal and may change without notice.&lt;/p&gt;
+
+&lt;p&gt;First we need to implement our query:&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+namespace DV
+{
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using EPiServer.Notification;
+    using EPiServer.ServiceLocation;
+    using EPiServer.Shell.ObjectEditing;
+
+    [ServiceConfiguration(typeof(ISelectionQuery))]
+    public class UserSelectionQuery : ISelectionQuery
+    {
+        private readonly IQueryableNotificationUsers userRepository;
+
+        public UserSelectionQuery(IQueryableNotificationUsers userRepository)
+        {
+            this.userRepository = userRepository;
+        }
+
+        public ISelectItem GetItemByValue(string value)
+        {
+            var task = Task.Run(async () =&amp;gt; await this.userRepository.FindAsync(value, 0, 1));
+
+            task.Wait();
+
+            if (task.Result.TotalCount == 0)
+            {
+                return null;
+            }
+
+            var user = task.Result.PagedResult.Single();
+
+            return new SelectItem
+            {
+                Text = $&amp;quot;{user.DisplayName} ({user.UserName})&amp;quot;,
+                Value = user.UserName
+            };
+        }
+
+        public IEnumerable&amp;lt;ISelectItem&amp;gt; GetItems(string query)
+        {
+            var task = Task.Run(async () =&amp;gt; await this.userRepository.FindAsync(query, 0, 10));
+
+            task.Wait();
+
+            if (task.Result.TotalCount == 0)
+            {
+                return Enumerable.Empty&amp;lt;ISelectItem&amp;gt;();
+            }
+
+            return task.Result.PagedResult.Select(user =&amp;gt; new SelectItem
+            {
+                Text = $&amp;quot;{user.DisplayName} ({user.UserName})&amp;quot;,
+                Value = user.UserName
+            });
+        }
+    }
+}
+&lt;/pre&gt;
+
+&lt;p&gt;Then we can use it in the attribute:&lt;/p&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;
+[AutoSuggestSelection(typeof(UserSelectionQuery))]
+[Display(Name = &quot;Published by&quot;)]
+public virtual string PublishedBy { get; set; }
+&lt;/pre&gt;
+
+&lt;p&gt;Hope this helps.&lt;/p&gt; 
+  </content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>

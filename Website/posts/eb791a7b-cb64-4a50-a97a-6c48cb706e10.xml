@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>How to get the external URL to content</title>
+  <slug>how-to-get-the-external-url-to-content</slug>
+  <author></author>
+  <pubDate>2016-01-19 13:53:19</pubDate>
+  <lastModified>2016-01-19 13:53:19</lastModified>
+  <excerpt></excerpt>
+  <content>&lt;p&gt;This topic comes up from time to time in the forums. I don’t find &lt;a href="http://www.dcaric.com/blog/episerver-how-to-get-external-page-url"&gt;some&lt;/a&gt; of the &lt;a href="https://andersnordby.wordpress.com/2014/04/29/getting-an-external-url-in-episerver-7-x/"&gt;solutions&lt;/a&gt; given completely adequate. They usually just makes the URL absolute by appending the current context’s host name, if present. What we should do instead, is to load the &lt;code&gt;SiteDefinition&lt;/code&gt; for the content passed in to our method and then load the host from that definition. The site definition can contain multiple hosts and different kinds as well, e.g. primary host.&lt;/p&gt;  &lt;p&gt;This method also works for &lt;code&gt;MediaData&lt;/code&gt;.&lt;/p&gt;  &lt;pre class="prettyprint"&gt;public static string ContentExternalUrl(this ContentReference contentLink, CultureInfo contentLanguage, bool absoluteUrl)
+{
+    var result = ServiceLocator.Current.GetInstance&amp;lt;UrlResolver&amp;gt;().GetUrl(
+        contentLink,
+        contentLanguage.Name,
+        new VirtualPathArguments
+        {
+            ContextMode = ContextMode.Default,
+            ForceCanonical = absoluteUrl
+        });
+
+    // HACK: Temprorary fix until GetUrl and ForceCanonical works as expected,
+    // i.e returning an absolute URL even if there is a HTTP context that matches the content's site definition and host.
+    if (absoluteUrl)
+    {
+        Uri relativeUri;
+
+        if (Uri.TryCreate(result, UriKind.RelativeOrAbsolute, out relativeUri))
+        {
+            if (!relativeUri.IsAbsoluteUri)
+            {
+                var siteDefinitionResolver = ServiceLocator.Current.GetInstance&amp;lt;SiteDefinitionResolver&amp;gt;();
+                var siteDefinition = siteDefinitionResolver.GetDefinitionForContent(contentLink, true, true);
+                var hosts = siteDefinition.GetHosts(contentLanguage, true).ToList();
+
+                var host = hosts.FirstOrDefault(h =&amp;gt; h.Type == HostDefinitionType.Primary) 
+                    ?? hosts.FirstOrDefault(h =&amp;gt; h.Type == HostDefinitionType.Undefined);
+
+                var basetUri = siteDefinition.SiteUrl;
+
+                if (host != null &amp;amp;&amp;amp; host.Name.Equals(&amp;quot;*&amp;quot;) == false)
+                {
+                    // Try to create a new base URI from the host with the site's URI scheme. Name should be a valid
+                    // authority, i.e. have a port number if it differs from the URI scheme's default port number.
+                    Uri.TryCreate(siteDefinition.SiteUrl.Scheme + &amp;quot;://&amp;quot; + host.Name, UriKind.Absolute, out basetUri);
+                }
+
+                var absoluteUri = new Uri(basetUri, relativeUri);
+
+                return absoluteUri.AbsoluteUri;
+            }
+        }
+    }
+
+    return result;
+}&lt;/pre&gt;</content>
+  <ispublished>true</ispublished>
+  <categories>
+    <category>EPiServer</category>
+  </categories>
+  <comments></comments>
+</post>
