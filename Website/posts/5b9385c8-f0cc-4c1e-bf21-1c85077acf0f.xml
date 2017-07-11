@@ -8,7 +8,7 @@
   <content>&lt;p&gt;So, I was struggling with creating and updating content in different languages from code. I was able to create language versions of every content for all the languages, but they all ended up with the same content – the content of the first language version, i.e. the master language!&lt;/p&gt;  &lt;p&gt;Turned out I was calling &lt;code&gt;Get&amp;lt;T&amp;gt;(ContentReference contentLink, ILanguageSelector selector)&lt;/code&gt; in &lt;code&gt;IContentLoader&lt;/code&gt; with a &lt;code&gt;ContentReference&lt;/code&gt; that had a &lt;var&gt;WorkID&lt;/var&gt; to get the current data for updating it. That did of course override the &lt;var&gt;selector&lt;/var&gt; parameter I was passing with another language. The content I got back was in the language of the content with that specific WorkID (in this case the master language). So my code just kept updating the master language version and not the language version I was trying to update.&lt;/p&gt;  &lt;p&gt;Bottom line; Call &lt;code&gt;Get()&lt;/code&gt; with a &lt;code&gt;ContentReference&lt;/code&gt; without a &lt;var&gt;WorkID&lt;/var&gt;, unless you really want to get that specific version of the content. You can call the extension method &lt;code&gt;ToReferenceWithoutVersion()&lt;/code&gt; to construct a &lt;code&gt;ContentReference&lt;/code&gt; without a &lt;var&gt;WorkID&lt;/var&gt;.&lt;/p&gt;</content>
   <ispublished>true</ispublished>
   <categories>
-    <category>EPiServer</category>
+    <category>Episerver</category>
   </categories>
   <comments></comments>
 </post>

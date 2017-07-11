@@ -19,7 +19,7 @@ DataFactory.Instance.Save(
 	</content>
   <ispublished>true</ispublished>
   <categories>
-    <category>EPiServer</category>
+    <category>Episerver</category>
   </categories>
   <comments></comments>
 </post>

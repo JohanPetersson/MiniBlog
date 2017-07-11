@@ -16,7 +16,7 @@
 &lt;p&gt;The important part here is of course &lt;code&gt;/download&lt;/code&gt;. For images you can add &lt;code&gt;/thumbnail&lt;/code&gt; (or the name of another blob property) to get the thumbnail of the image.&lt;/p&gt;</content>
   <ispublished>true</ispublished>
   <categories>
-    <category>EPiServer</category>
+    <category>Episerver</category>
   </categories>
   <comments></comments>
 </post>

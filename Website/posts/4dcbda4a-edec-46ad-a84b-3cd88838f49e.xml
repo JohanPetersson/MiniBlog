@@ -11,7 +11,7 @@
 clientResources.RequireScript("/scripts/my-block-script.js", "MyScript", new[] { "MainScripts" }).AtFooter();&lt;/pre&gt;&lt;p&gt;If the script doesn't have any dependencies, you can pass &lt;code&gt;Enumerable.Empty&amp;lt;string&amp;gt;()&lt;/code&gt; instead of &lt;code&gt;new[] { "MainScripts" }&lt;/code&gt;.&lt;/p&gt;</content>
   <ispublished>true</ispublished>
   <categories>
-    <category>EPiServer</category>
+    <category>Episerver</category>
   </categories>
   <comments></comments>
 </post>

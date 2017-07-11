@@ -134,7 +134,7 @@ public virtual PageReference NotFoundPage { get; set; }&lt;/pre&gt;
 &lt;p&gt;We’re parsing out the first segment of the requested url, then we’re trying to match that segment with all available language versions of the page, including fallback settings. The correct language will be loaded automatically, if we have a domain for the language and not a segment in the url, but that’s not always the case.&lt;/p&gt;</content>
   <ispublished>true</ispublished>
   <categories>
-    <category>EPiServer</category>
+    <category>Episerver</category>
   </categories>
   <comments></comments>
 </post>

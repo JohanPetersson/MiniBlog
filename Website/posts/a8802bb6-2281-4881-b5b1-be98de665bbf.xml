@@ -207,7 +207,7 @@ public class SitePropertyRenderer : PropertyRenderer
   <ispublished>true</ispublished>
   <categories>
     <category>MVC</category>
-    <category>EPiServer</category>
+    <category>Episerver</category>
   </categories>
   <comments></comments>
 </post>

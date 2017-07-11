@@ -67,7 +67,7 @@ public class ContainerConfigurableModule : IConfigurableModule
 &lt;p&gt;I have some more blog post in the pipeline on the same topic; keeping the views and output clean. So stay tuned!&lt;/p&gt;</content>
   <ispublished>true</ispublished>
   <categories>
-    <category>EPiServer</category>
+    <category>Episerver</category>
     <category>MVC</category>
   </categories>
   <comments></comments>

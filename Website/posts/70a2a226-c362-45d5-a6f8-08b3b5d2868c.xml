@@ -22,7 +22,7 @@
 &lt;pre class="prettyprint"&gt;&amp;lt;a href=&amp;quot;%UNSUBSCRIBELINK%&amp;quot; &amp;lt;%= EPiServer.Web.UrlRewriteProvider.UrlPreventRewriteAttribute %&amp;gt;=&amp;quot;true&amp;quot; id=&amp;quot;required-id-but-not-used&amp;quot;&amp;gt;Unsubscribe&amp;lt;/a&amp;gt;&lt;/pre&gt;</content>
   <ispublished>true</ispublished>
   <categories>
-    <category>EPiServer</category>
+    <category>Episerver</category>
   </categories>
   <comments></comments>
 </post>
