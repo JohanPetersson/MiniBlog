@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<post>
+  <title>Prevent editors from deleting "system" content</title>
+  <slug>prevent-editors-from-deleting-system-content</slug>
+  <author>johan</author>
+  <pubDate>2017-07-11 15:43:07</pubDate>
+  <lastModified>2017-07-11 15:43:07</lastModified>
+  <excerpt></excerpt>
+  <content>
+	&lt;p&gt;Sometimes you have content, e.g. pages, that's necessary for the website to run. This could be the startpage, news archive page, search page and so on. Let's call them 'system content'.&lt;/p&gt;
+
+&lt;p&gt;Now, if you want to prevent your editors from accidentally deleting these pages you could change the permissions to these pages. The downside with using the regular content permissions is that you have to stop the inheritance of the permissions, and not just that, you also need to reset them again for every child page that you want the editors to able to delete.&lt;/p&gt;
+
+&lt;p&gt;This gets unmanageable after a while.&lt;/p&gt;
+
+&lt;p&gt;So what can we do instead? Well, we could hook in to the content events in the content repository and then stop them from being deleted.&lt;/p&gt;
+
+&lt;p&gt;First we define an interface to mark all content types that should not be deleted.&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;
+namespace DV.ContentTypes.Interfaces
+{
+    using EPiServer.Core;
+
+    /// &amp;lt;summary&amp;gt;
+    ///     Decorate content types with this interface to classify them
+    ///     as system content. System content should not be deleted by editors e.g..
+    ///     We will stop editors from deleting these content items unless they have
+    ///     access to that function. Please see &amp;lt;see cref="DV.DeleteSystemContentPermissions"/&amp;gt;
+    ///     and  &amp;lt;see cref="DV.SystemContentInitialization"/&amp;gt;.
+    /// &amp;lt;/summary&amp;gt;
+    public interface ISystemContent : IContent
+    {
+    }
+}
+&lt;/pre&gt;
+
+&lt;p&gt;Then we decorate our content types.&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;
+namespace DV.ContentTypes.Pages
+{
+    [ContentType]
+    public class HomePage : PageData, ISystemContent
+    {
+    }
+}
+&lt;/pre&gt;
+
+&lt;p&gt;But hey, wouldn't it be nice if we could delete them anyway, in like special cases? Let's create special permissions, &lt;a href="https://world.episerver.com/documentation/developer-guides/cms/security/permissions-to-functions/"&gt;Permission to Functions&lt;/a&gt; to the rescue.&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;
+namespace DV
+{
+    using EPiServer.DataAnnotations;
+    using EPiServer.Security;
+
+    [PermissionTypes]
+    public static class DeleteSystemContentPermissions
+    {
+        static DeleteSystemContentPermissions()
+        {
+            DeleteContent = new PermissionType(nameof(DeleteSystemContentPermissions), nameof(DeleteContent));
+            DeleteLanguageVersion = new PermissionType(nameof(DeleteSystemContentPermissions), nameof(DeleteLanguageVersion));
+        }
+
+        public static PermissionType DeleteContent { get; private set; }
+
+        public static PermissionType DeleteLanguageVersion { get; private set; }
+    }
+}
+&lt;/pre&gt;
+
+&lt;p&gt;Please follow the guide in the link above to give the permissions more meaningfull descriptions by also creating translations.&lt;/p&gt;
+
+&lt;p&gt;Now we can create an initializable module that will actully prevent editors from deleting 'system content' or allow them if they have enough permissions.&lt;/p&gt;
+
+&lt;pre class="prettyprint"&gt;
+namespace DV
+{
+    using EPiServer;
+    using EPiServer.Core;
+    using EPiServer.Framework;
+    using EPiServer.Framework.Initialization;
+    using EPiServer.Security;
+    using EPiServer.ServiceLocation;
+
+    [InitializableModule]
+    [ModuleDependency(typeof(EPiServer.Web.InitializationModule))]
+    public class SystemContentInitialization : IInitializableModule
+    {
+        public void Initialize(InitializationEngine context)
+        {
+            var contentEvents = ServiceLocator.Current.GetInstance&amp;lt;IContentEvents&amp;gt;();
+
+            contentEvents.MovingContent += this.MovingContent;
+            contentEvents.DeletingContentLanguage += this.DeletingContentLanguage;
+        }
+
+        public void Uninitialize(InitializationEngine context)
+        {
+            var contentEvents = ServiceLocator.Current.GetInstance&amp;lt;IContentEvents&amp;gt;();
+
+            contentEvents.MovingContent -= this.MovingContent;
+            contentEvents.DeletingContentLanguage -= this.DeletingContentLanguage;
+        }
+
+        private void MovingContent(object sender, ContentEventArgs e)
+        {
+            if (e.Content is ISystemContent == false)
+            {
+                return;
+            }
+
+            if (e.TargetLink.Equals(ContentReference.WasteBasket, true) == false)
+            {
+                return;
+            }
+
+            bool hasPermission = PrincipalInfo.Current.IsPermitted(DeleteSystemContentPermissions.DeleteContent);
+
+            if (hasPermission == false)
+            {
+                e.CancelAction = true;
+                e.CancelReason = "You're not allowed to delete this content. You need permission to this function.";
+            }
+        }
+
+        private void DeletingContentLanguage(object sender, ContentEventArgs e)
+        {
+            if (e.Content is ISystemContent == false)
+            {
+                return;
+            }
+
+            bool hasPermission = PrincipalInfo.Current.IsPermitted(DeleteSystemContentPermissions.DeleteLanguageVersion);
+
+            if (hasPermission == false)
+            {
+                e.CancelAction = true;
+                e.CancelReason = "You're not allowed to delete this language. You need permission to this function.";
+            }
+        }
+    }
+}
+&lt;/pre&gt;
+
+&lt;p&gt;The Version gadget will unfortunately not display our &lt;code&gt;CancelReason&lt;/code&gt; message when deleting a language version, but if you try to delete the content (master language), then our message will be displayed. I you're using the Language Add-on, then the add-on will just throw an error when you delete a language. I wish that add-on would handle this better, but hey, it will at least stop the editors from deleting the language.&lt;/p&gt;
+	</content>
+  <ispublished>true</ispublished>
+	<categories>
+		<category>Episerver</category>
+	</categories>
+  <comments></comments>
+</post>
