@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <post>
-  <title>Prevent editors from deleting "system" content</title>
+  <title>Prevent editors from deleting "system content"</title>
   <slug>prevent-editors-from-deleting-system-content</slug>
   <author>johan</author>
   <pubDate>2017-07-11 15:43:07</pubDate>
@@ -47,7 +47,7 @@ namespace DV.ContentTypes.Pages
 }
 &lt;/pre&gt;
 
-&lt;p&gt;But hey, wouldn't it be nice if we could delete them anyway, in like special cases? Let's create special permissions, &lt;a href="https://world.episerver.com/documentation/developer-guides/cms/security/permissions-to-functions/"&gt;Permission to Functions&lt;/a&gt; to the rescue.&lt;/p&gt;
+&lt;p&gt;But hey, wouldn't it be nice if we could delete them anyway, in like special cases? Let's create some special permissions, &lt;a href="https://world.episerver.com/documentation/developer-guides/cms/security/permissions-to-functions/"&gt;Permission to Functions&lt;/a&gt; to the rescue.&lt;/p&gt;
 
 &lt;pre class="prettyprint"&gt;
 namespace DV
@@ -71,9 +71,9 @@ namespace DV
 }
 &lt;/pre&gt;
 
-&lt;p&gt;Please follow the guide in the link above to give the permissions more meaningfull descriptions by also creating translations.&lt;/p&gt;
+&lt;p&gt;Follow the guide in the link above to give the permissions more meaningfull descriptions by also creating translations.&lt;/p&gt;
 
-&lt;p&gt;Now we can create an initializable module that will actully prevent editors from deleting 'system content' or allow them if they have enough permissions.&lt;/p&gt;
+&lt;p&gt;Now we can create an initializable module that will actually prevent editors from deleting 'system content' or allow them if they have enough permissions.&lt;/p&gt;
 
 &lt;pre class="prettyprint"&gt;
 namespace DV
@@ -145,7 +145,7 @@ namespace DV
 }
 &lt;/pre&gt;
 
-&lt;p&gt;The Version gadget will unfortunately not display our &lt;code&gt;CancelReason&lt;/code&gt; message when deleting a language version, but if you try to delete the content (master language), then our message will be displayed. I you're using the Language Add-on, then the add-on will just throw an error when you delete a language. I wish that add-on would handle this better, but hey, it will at least stop the editors from deleting the language.&lt;/p&gt;
+&lt;p&gt;The Version gadget will unfortunately not display our &lt;code&gt;CancelReason&lt;/code&gt; message when deleting a language version, but if you try to delete the content (master language), then our message will be displayed. I you're using the Language add-on, then the add-on will just throw an error when you delete a language. I wish the Language add-on would handle this better, but hey, it will at least stop the editors from deleting the language version.&lt;/p&gt;
 	</content>
   <ispublished>true</ispublished>
 	<categories>
